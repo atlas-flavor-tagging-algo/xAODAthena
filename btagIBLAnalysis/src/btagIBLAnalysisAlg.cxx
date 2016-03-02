@@ -10,6 +10,7 @@
 
 #include "btagIBLAnalysisAlg.h"
 #include "GAFlavourLabel.h"
+#include "ClusterBranches.hh"
 
 #include "xAODEventInfo/EventInfo.h"
 #include "xAODTruth/TruthEventContainer.h"
