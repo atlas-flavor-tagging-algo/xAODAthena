@@ -354,6 +354,10 @@ class btagIBLAnalysisAlg: public ::AthHistogramAlgorithm {
   std::vector<std::vector<float> > *v_jet_trk_IP2D_llr;
   std::vector<std::vector<float> > *v_jet_trk_IP3D_llr;
 
+  // actual d0 variables (not lifetime-signed)
+  std::vector<std::vector<float> > *v_jet_trk_ip_d0;
+  std::vector<std::vector<float> > *v_jet_trk_ip_z0;
+
   std::vector<std::vector<int> > *v_jet_trk_jf_Vertex; //mod Remco
 
   // those are just quick accessors

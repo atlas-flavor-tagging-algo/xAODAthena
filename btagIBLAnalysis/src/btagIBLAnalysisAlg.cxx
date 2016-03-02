@@ -433,6 +433,10 @@ StatusCode btagIBLAnalysisAlg::initialize() {
   v_jet_trk_IP2D_llr = new std::vector<std::vector<float> >();
   v_jet_trk_IP3D_llr = new std::vector<std::vector<float> >();
 
+  // non-lifetime signed
+  v_jet_trk_ip_d0 = new std::vector<std::vector<float> >();
+  v_jet_trk_ip_z0 = new std::vector<std::vector<float> >();
+
   v_jet_trk_jf_Vertex = new std::vector<std::vector<int> >(); // mod Remco
 
   // those are just quick accessors
@@ -763,6 +767,9 @@ StatusCode btagIBLAnalysisAlg::initialize() {
     tree->Branch("jet_trk_ip3d_z0", &v_jet_trk_IP3D_z0);
     tree->Branch("jet_trk_ip3d_d0sig", &v_jet_trk_IP3D_d0sig);
     tree->Branch("jet_trk_ip3d_z0sig", &v_jet_trk_IP3D_z0sig);
+
+    tree->Branch("jet_trk_ip_d0", &v_jet_trk_ip_d0);
+    tree->Branch("jet_trk_ip_z0", &v_jet_trk_ip_z0);
 
     tree->Branch("jet_trk_ip2d_llr", &v_jet_trk_IP2D_llr);
     tree->Branch("jet_trk_ip3d_llr", &v_jet_trk_IP3D_llr);
@@ -2124,6 +2131,9 @@ StatusCode btagIBLAnalysisAlg::execute() {
     std::vector<float> j_trk_ip2d_llr;
     std::vector<float> j_trk_ip3d_llr;
 
+    std::vector<float> j_trk_ip_d0;
+    std::vector<float> j_trk_ip_z0;
+
     std::vector<float> j_sv0_vtxx;
     std::vector<float> j_sv0_vtxy;
     std::vector<float> j_sv0_vtxz;
@@ -2639,6 +2649,10 @@ StatusCode btagIBLAnalysisAlg::execute() {
       j_trk_ip3d_d0sig.push_back( significance );
       j_trk_ip3d_z0sig.push_back(z0Sig);
 
+      // unsigned parameters
+      j_trk_ip_d0.push_back(d0wrtPriVtx);
+      j_trk_ip_z0.push_back(z0wrtPriVtx);
+
       // TRUTH track info ......
       if (origin == PUFAKE) {
         j_trk_d0_truth.push_back(-999);
@@ -2695,6 +2709,9 @@ StatusCode btagIBLAnalysisAlg::execute() {
     v_jet_trk_IP3D_z0->push_back(j_trk_ip3d_z0);
     v_jet_trk_IP3D_d0sig->push_back(j_trk_ip3d_d0sig);
     v_jet_trk_IP3D_z0sig->push_back(j_trk_ip3d_z0sig);
+
+    v_jet_trk_ip_d0->  push_back(j_trk_ip_d0);
+    v_jet_trk_ip_z0->  push_back(j_trk_ip_z0);
 
     v_jet_trk_IP2D_llr->push_back(j_trk_ip2d_llr);
     v_jet_trk_IP3D_llr->push_back(j_trk_ip3d_llr);
@@ -3042,6 +3059,11 @@ void btagIBLAnalysisAlg :: clearvectors() {
   v_jet_trk_IP3D_z0->clear();
   v_jet_trk_IP3D_d0sig->clear();
   v_jet_trk_IP3D_z0sig->clear();
+
+  v_jet_trk_ip_d0->clear();
+  v_jet_trk_ip_z0->clear();
+
+
   v_jet_trk_vtx_X->clear();
   v_jet_trk_vtx_Y->clear();
   v_jet_trk_vtx_dx->clear();
