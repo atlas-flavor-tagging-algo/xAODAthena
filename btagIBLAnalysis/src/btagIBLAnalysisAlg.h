@@ -371,14 +371,6 @@ class btagIBLAnalysisAlg: public ::AthHistogramAlgorithm {
   std::vector<float> *v_jet_sv_scaled_efc;
   std::vector<float> *v_jet_jf_scaled_efc;
 
-  // additions by Nikola
-  std::vector<std::vector<float> >  *v_jet_trkjet_pt;
-  std::vector<std::vector<float> >  *v_jet_trkjet_eta;
-  std::vector<std::vector<float> >  *v_jet_trkjet_phi;
-  std::vector<std::vector<float> >  *v_jet_trkjet_m;
-  std::vector<std::vector<int> >  *v_jet_trkjet_ntrk;
-  std::vector<std::vector<double> > *v_jet_trkjet_mv2c20;
-
   // additions by Andrea
   std::vector<float> *v_jet_mu_truthflav;
   std::vector<float> *v_jet_mu_dR;
@@ -439,6 +431,7 @@ class btagIBLAnalysisAlg: public ::AthHistogramAlgorithm {
   ClusterBranches m_cluster_branches;
   // subjet dumper
   SubjetBranches m_exkt_branches;
+  SubjetBranches m_trkjet_branches;
 
   /// tool handle for jet cleaning tool
   ToolHandle< IJetSelector > m_jetCleaningTool;

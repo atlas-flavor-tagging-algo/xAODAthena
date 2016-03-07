@@ -91,6 +91,7 @@ btagIBLAnalysisAlg::btagIBLAnalysisAlg( const std::string& name, ISvcLocator *pS
   m_stream("BTAGSTREAM"),
   m_cluster_branches(),
   m_exkt_branches(),
+  m_trkjet_branches(),
   m_jetCleaningTool("JetCleaningTool/JetCleaningTool", this),
   m_jetCalibrationTool(""),
   m_InDetTrackSelectorTool(""),
@@ -190,6 +191,7 @@ StatusCode btagIBLAnalysisAlg::initialize() {
   // addition from Dan: create cluster branches
   m_cluster_branches.set_tree(*tree);
   m_exkt_branches.set_tree(*tree, "jet_exktsubjet_");
+  m_trkjet_branches.set_tree(*tree, "jet_trkjet_");
 
   // Setup branches
   v_jet_pt = new std::vector<float>(); //v_jet_pt->reserve(15);
@@ -455,14 +457,6 @@ StatusCode btagIBLAnalysisAlg::initialize() {
   v_jet_trk3_z0sig  = new std::vector<float>();
   v_jet_sv_scaled_efc  = new std::vector<float>();
   v_jet_jf_scaled_efc  = new std::vector<float>();
-
-  // additions by nikola
-  v_jet_trkjet_pt = new std::vector<std::vector<float> >();
-  v_jet_trkjet_eta = new std::vector<std::vector<float> >();
-  v_jet_trkjet_phi = new std::vector<std::vector<float> >();
-  v_jet_trkjet_m = new std::vector<std::vector<float> >();
-  v_jet_trkjet_ntrk = new std::vector<std::vector<int> >();
-  v_jet_trkjet_mv2c20 = new std::vector<std::vector<double> >();
 
   // additions by andrea
   v_jet_mu_assJet_pt = new std::vector<float>();
@@ -786,15 +780,6 @@ StatusCode btagIBLAnalysisAlg::initialize() {
   if (!m_essentialInfo) tree->Branch("jet_trk3_z0sig", &v_jet_trk3_z0sig);
   if (!m_essentialInfo) tree->Branch("jet_sv_scaled_efc", &v_jet_sv_scaled_efc);
   if (!m_essentialInfo) tree->Branch("jet_jf_scaled_efc", &v_jet_jf_scaled_efc);
-
-
-  // additions by nikola
-  if (!m_essentialInfo) tree->Branch("jet_trkjet_pt", &v_jet_trkjet_pt);
-  if (!m_essentialInfo) tree->Branch("jet_trkjet_eta", &v_jet_trkjet_eta);
-  if (!m_essentialInfo) tree->Branch("jet_trkjet_phi", &v_jet_trkjet_phi);
-  if (!m_essentialInfo) tree->Branch("jet_trkjet_m", &v_jet_trkjet_m);
-  if (!m_essentialInfo) tree->Branch("jet_trkjet_ntrk", &v_jet_trkjet_ntrk);
-  if (!m_essentialInfo) tree->Branch("jet_trkjet_mv2c20", &v_jet_trkjet_mv2c20);
 
   // additions by andrea
   if (m_SMT) {
@@ -2030,36 +2015,12 @@ StatusCode btagIBLAnalysisAlg::execute() {
     if (strcmp(m_jetCollectionName.c_str(), "AntiKt10LCTopoTrimmedPtFrac5SmallR20Jets") == 0 || strcmp(m_jetCollectionName.c_str(), "Akt10LCTopoTrmJets") == 0) {
       // ATH_MSG_INFO("this is a trimmed large-R jet collection, adding information (pt and mv2c00) of track jets associated to parent untrimmed jet collection");
 
-      std::vector<float> trkjet_pt;
-      std::vector<float> trkjet_eta;
-      std::vector<float> trkjet_phi;
-      std::vector<float> trkjet_m;
-      std::vector<int> trkjet_ntrk;
-      std::vector<double> trkjet_mv2c20;
-
       std::vector<const xAOD::Jet*> ghostTrackJet2;
 
       jet_parent->getAssociatedObjects<xAOD::Jet>("GhostAntiKt2TrackJet", ghostTrackJet2);
-
-      for (unsigned int i = 0; i < ghostTrackJet2.size(); i++) {
-        // apply track jet selection
-        if (ghostTrackJet2.at(i)->numConstituents() >= 2 && ghostTrackJet2.at(i)->pt() > 10000 && fabs(ghostTrackJet2.at(i)->eta()) < 2.5) {
-          trkjet_pt.push_back(ghostTrackJet2.at(i)->pt());
-          trkjet_eta.push_back(ghostTrackJet2.at(i)->eta());
-          trkjet_phi.push_back(ghostTrackJet2.at(i)->phi());
-          trkjet_m.push_back(ghostTrackJet2.at(i)->m());
-          trkjet_ntrk.push_back(ghostTrackJet2.at(i)->numConstituents());
-
-          const xAOD::BTagging *ghostTrackBJet = ghostTrackJet2.at(i)->btagging();
-          trkjet_mv2c20.push_back(ghostTrackBJet->auxdata<double>("MV2c20_discriminant"));
-        }
+      if (ghostTrackJet2.size() >= 2) {
+        m_trkjet_branches.fill(ghostTrackJet2);
       }
-      v_jet_trkjet_pt->push_back(trkjet_pt);
-      v_jet_trkjet_eta->push_back(trkjet_eta);
-      v_jet_trkjet_phi->push_back(trkjet_phi);
-      v_jet_trkjet_m->push_back(trkjet_m);
-      v_jet_trkjet_ntrk->push_back(trkjet_ntrk);
-      v_jet_trkjet_mv2c20->push_back(trkjet_mv2c20);
     }
 
     // now the tracking part: prepare all the tmpVectors
@@ -3058,14 +3019,6 @@ void btagIBLAnalysisAlg :: clearvectors() {
   v_jet_trk3_z0sig->clear();
   v_jet_sv_scaled_efc->clear();
   v_jet_jf_scaled_efc->clear();
-
-  // additions by nikola
-  v_jet_trkjet_pt->clear();
-  v_jet_trkjet_eta->clear();
-  v_jet_trkjet_phi->clear();
-  v_jet_trkjet_m->clear();
-  v_jet_trkjet_ntrk->clear();
-  v_jet_trkjet_mv2c20->clear();
 
   // additions by andrea
   v_jet_mu_pt->clear();
