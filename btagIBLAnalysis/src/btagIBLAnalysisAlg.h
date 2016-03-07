@@ -1,6 +1,8 @@
 #ifndef BTAGIBLANALYSIS_BTAGIBLANALYSISALG_H
 #define BTAGIBLANALYSIS_BTAGIBLANALYSISALG_H 1
 
+#include "ClusterBranches.hh"
+
 #include "AthenaBaseComps/AthHistogramAlgorithm.h"
 #include "GaudiKernel/ToolHandle.h" 
 
@@ -435,6 +437,9 @@ class btagIBLAnalysisAlg: public ::AthHistogramAlgorithm {
   std::string m_triggerLogic;
   
  private: 
+
+  // cluster dumper
+  ClusterBranches m_cluster_branches;
 
   /// tool handle for jet cleaning tool
   ToolHandle< IJetSelector > m_jetCleaningTool;

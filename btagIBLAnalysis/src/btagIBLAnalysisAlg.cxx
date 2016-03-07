@@ -89,8 +89,9 @@ bool isFromWZ( const xAOD::TruthParticle* particle ) {
 btagIBLAnalysisAlg::btagIBLAnalysisAlg( const std::string& name, ISvcLocator *pSvcLocator ) :
   AthHistogramAlgorithm(name, pSvcLocator),
   m_stream("BTAGSTREAM"),
-  m_jetCalibrationTool(""),
+  m_cluster_branches(),
   m_jetCleaningTool("JetCleaningTool/JetCleaningTool", this),
+  m_jetCalibrationTool(""),
   m_InDetTrackSelectorTool(""),
   m_TightTrackVertexAssociationTool(""),
   m_tdt("Trig::TrigDecisionTool/TrigDecisionTool"),
@@ -120,12 +121,15 @@ btagIBLAnalysisAlg::btagIBLAnalysisAlg( const std::string& name, ISvcLocator *pS
   declareProperty( "GRLname", m_GRLname = "" );
   declareProperty( "JetCollectionName", m_jetCollectionName = "AntiKt4LCTopoJets" );
   declareProperty( "JetPtCut", m_jetPtCut = 20.e3 );
-  
+
   declareProperty( "TriggerLogic", m_triggerLogic );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-btagIBLAnalysisAlg::~btagIBLAnalysisAlg() {}
+btagIBLAnalysisAlg::~btagIBLAnalysisAlg() {
+  // FIXME: we're leaking memory with all the vectors, that we never
+  // delete, but I suppose there are bigger issues with this code.
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 StatusCode btagIBLAnalysisAlg::initialize() {
@@ -181,6 +185,9 @@ StatusCode btagIBLAnalysisAlg::initialize() {
   CHECK( m_PUtool.retrieve() );
 
   ATH_CHECK(m_tdt.retrieve());
+
+  // addition from Dan: create cluster branches
+  m_cluster_branches.set_tree(*tree);
 
   // Setup branches
   v_jet_pt = new std::vector<float>(); //v_jet_pt->reserve(15);
@@ -1144,6 +1151,9 @@ StatusCode btagIBLAnalysisAlg::execute() {
   // Now run over the selected jets and do whatever else needs doing
   for (unsigned int j = 0; j < selJets.size(); j++) {
     const xAOD::Jet *jet = selJets.at(j);
+
+    // addition from Dan: fill clusters
+    m_cluster_branches.fill(jet->getConstituents());
 
     // additions by nikola
     const xAOD::Jet *jet_parent = 0;
@@ -2736,6 +2746,9 @@ StatusCode btagIBLAnalysisAlg::execute() {
   truth_electrons.clear();
   truth_muons.clear();
   selJets.clear();
+
+  // addition from Dan: clear clusters
+  m_cluster_branches.clear();
 
   return StatusCode::SUCCESS;
 }

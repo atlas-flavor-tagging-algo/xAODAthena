@@ -1,2 +1,4 @@
 .svn/
-.confdb*
+*.confdb*
+*cmt/*up.*
+*Conf.py

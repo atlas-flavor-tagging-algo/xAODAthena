@@ -32,6 +32,7 @@ use  xAODTrigger        xAODTrigger-*      	Event/xAOD
 use  GoodRunsLists      GoodRunsLists-*         DataQuality
 use  TrigDecisionTool   TrigDecisionTool-*      Trigger/TrigAnalysis
 use  xAODMuon           xAODMuon-*              Event/xAOD
+use  AthContainers      AthContainers-*         Control
 
 use TrkVertexFitterInterfaces  TrkVertexFitterInterfaces-*     Tracking/TrkVertexFitter
 use ITrackToVertex             ITrackToVertex-*                Reconstruction/RecoTools
