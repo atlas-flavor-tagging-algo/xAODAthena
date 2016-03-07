@@ -31,7 +31,6 @@ public:
   void clear();
 private:
   SubjetBranchBuffer* m_branches;
-  // TODO: add things here
 };
 
 #endif // SUBJET_BRANCHES_HH

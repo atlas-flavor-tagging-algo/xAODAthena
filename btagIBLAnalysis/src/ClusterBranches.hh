@@ -27,7 +27,6 @@ public:
   void clear();
 private:
   ClusterBranchBuffer* m_branches;
-  // TODO: add things here
 };
 
 #endif // CLUSTER_BRANCHES_HH
