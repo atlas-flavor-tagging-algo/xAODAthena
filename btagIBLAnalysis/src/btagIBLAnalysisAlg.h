@@ -1,7 +1,9 @@
 #ifndef BTAGIBLANALYSIS_BTAGIBLANALYSISALG_H
 #define BTAGIBLANALYSIS_BTAGIBLANALYSISALG_H 1
 
+// Additions from Dan: classes to manage branches
 #include "ClusterBranches.hh"
+#include "SubjetBranches.hh"
 
 #include "AthenaBaseComps/AthHistogramAlgorithm.h"
 #include "GaudiKernel/ToolHandle.h" 
@@ -259,12 +261,6 @@ class btagIBLAnalysisAlg: public ::AthHistogramAlgorithm {
   std::vector<std::vector<float> > *v_jet_msv_vtx_ndf;
 
   // Exktbb
-  std::vector<std::vector<float> >  *v_jet_exktsubjet_pt;
-  std::vector<std::vector<float> >  *v_jet_exktsubjet_eta;
-  std::vector<std::vector<float> >  *v_jet_exktsubjet_phi;
-  std::vector<std::vector<float> >  *v_jet_exktsubjet_m;
-  std::vector<std::vector<int> >  *v_jet_exktsubjet_ntrk;
-  std::vector<std::vector<float> >  *v_jet_exktsubjet_mv2c20;
   std::vector<double> *v_jet_ExKtbb_Hbb_DoubleMV2c20;
   std::vector<double> *v_jet_ExKtbb_Hbb_SingleMV2c20;
   std::vector<double> *v_jet_ExKtbb_Hbb_MV2Only;
@@ -438,8 +434,11 @@ class btagIBLAnalysisAlg: public ::AthHistogramAlgorithm {
   
  private: 
 
+  // additions by Dan: branch collections
   // cluster dumper
   ClusterBranches m_cluster_branches;
+  // subjet dumper
+  SubjetBranches m_exkt_branches;
 
   /// tool handle for jet cleaning tool
   ToolHandle< IJetSelector > m_jetCleaningTool;

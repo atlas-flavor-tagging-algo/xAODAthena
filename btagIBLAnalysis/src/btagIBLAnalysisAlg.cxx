@@ -90,6 +90,7 @@ btagIBLAnalysisAlg::btagIBLAnalysisAlg( const std::string& name, ISvcLocator *pS
   AthHistogramAlgorithm(name, pSvcLocator),
   m_stream("BTAGSTREAM"),
   m_cluster_branches(),
+  m_exkt_branches(),
   m_jetCleaningTool("JetCleaningTool/JetCleaningTool", this),
   m_jetCalibrationTool(""),
   m_InDetTrackSelectorTool(""),
@@ -188,6 +189,7 @@ StatusCode btagIBLAnalysisAlg::initialize() {
 
   // addition from Dan: create cluster branches
   m_cluster_branches.set_tree(*tree);
+  m_exkt_branches.set_tree(*tree, "jet_exktsubjet_");
 
   // Setup branches
   v_jet_pt = new std::vector<float>(); //v_jet_pt->reserve(15);
@@ -345,12 +347,6 @@ StatusCode btagIBLAnalysisAlg::initialize() {
   v_jet_msv_vtx_chi = new std::vector<std::vector<float> >();
   v_jet_msv_vtx_ndf = new std::vector<std::vector<float> >();
 
-  v_jet_exktsubjet_pt = new std::vector<std::vector<float> >();
-  v_jet_exktsubjet_eta = new std::vector<std::vector<float> >();
-  v_jet_exktsubjet_phi = new std::vector<std::vector<float> >();
-  v_jet_exktsubjet_m = new std::vector<std::vector<float> >();
-  v_jet_exktsubjet_ntrk = new std::vector<std::vector<int> >();
-  v_jet_exktsubjet_mv2c20 = new std::vector<std::vector<float> >();
   v_jet_ExKtbb_Hbb_DoubleMV2c20 = new std::vector<double>();
   v_jet_ExKtbb_Hbb_SingleMV2c20 = new std::vector<double>();
   v_jet_ExKtbb_Hbb_MV2Only = new std::vector<double>();
@@ -684,12 +680,6 @@ StatusCode btagIBLAnalysisAlg::initialize() {
     tree->Branch("jet_msv_vtx_ndf", &v_jet_msv_vtx_ndf);
   }
 
-  if (!m_essentialInfo) tree->Branch("jet_exktsubjet_pt", &v_jet_exktsubjet_pt);
-  if (!m_essentialInfo) tree->Branch("jet_exktsubjet_eta", &v_jet_exktsubjet_eta);
-  if (!m_essentialInfo) tree->Branch("jet_exktsubjet_phi", &v_jet_exktsubjet_phi);
-  if (!m_essentialInfo) tree->Branch("jet_exktsubjet_m", &v_jet_exktsubjet_m);
-  if (!m_essentialInfo) tree->Branch("jet_exktsubjet_ntrk", &v_jet_exktsubjet_ntrk);
-  if (!m_essentialInfo) tree->Branch("jet_exktsubjet_mv2c20", &v_jet_exktsubjet_mv2c20);
   if (!m_essentialInfo) tree->Branch("jet_ExKtbb_Hbb_DoubleMV2c20", &v_jet_ExKtbb_Hbb_DoubleMV2c20);
   if (!m_essentialInfo) tree->Branch("jet_ExKtbb_Hbb_SingleMV2c20", &v_jet_ExKtbb_Hbb_SingleMV2c20);
   if (!m_essentialInfo) tree->Branch("jet_ExKtbb_Hbb_MV2Only", &v_jet_ExKtbb_Hbb_MV2Only);
@@ -2011,37 +2001,11 @@ StatusCode btagIBLAnalysisAlg::execute() {
 
     // ExKtbbTag
     if (bjet->isAvailable<double>("ExKtbb_Hbb_DoubleMV2c20")) {
-      std::vector<float> exktsubjet_pt;
-      std::vector<float> exktsubjet_eta;
-      std::vector<float> exktsubjet_phi;
-      std::vector<float> exktsubjet_m;
-      std::vector<int> exktsubjet_ntrk;
-      std::vector<float> exktsubjet_mv2c20;
       std::vector<const xAOD::Jet*> exKtJets;
       jet->getAssociatedObjects<xAOD::Jet>("ExKt2SubJets", exKtJets);
       if (exKtJets.size() == 2) {
-        exktsubjet_pt.push_back(exKtJets.at(0)->pt());
-        exktsubjet_eta.push_back(exKtJets.at(0)->eta());
-        exktsubjet_phi.push_back(exKtJets.at(0)->phi());
-        exktsubjet_m.push_back(exKtJets.at(0)->m());
-        exktsubjet_ntrk.push_back(exKtJets.at(0)->numConstituents());
-        const xAOD::BTagging *exktsubjet_btag0 = exKtJets.at(0)->btagging();
-        exktsubjet_mv2c20.push_back(exktsubjet_btag0->auxdata<double>("MV2c20_discriminant"));
-
-        exktsubjet_pt.push_back(exKtJets.at(1)->pt());
-        exktsubjet_eta.push_back(exKtJets.at(1)->eta());
-        exktsubjet_phi.push_back(exKtJets.at(1)->phi());
-        exktsubjet_m.push_back(exKtJets.at(1)->m());
-        exktsubjet_ntrk.push_back(exKtJets.at(1)->numConstituents());
-        const xAOD::BTagging *exktsubjet_btag1 = exKtJets.at(1)->btagging();
-        exktsubjet_mv2c20.push_back(exktsubjet_btag1->auxdata<double>("MV2c20_discriminant"));
+        m_exkt_branches.fill(exKtJets);
       }
-      v_jet_exktsubjet_pt->push_back(exktsubjet_pt);
-      v_jet_exktsubjet_eta->push_back(exktsubjet_eta);
-      v_jet_exktsubjet_phi->push_back(exktsubjet_phi);
-      v_jet_exktsubjet_m->push_back(exktsubjet_m);
-      v_jet_exktsubjet_ntrk->push_back(exktsubjet_ntrk);
-      v_jet_exktsubjet_mv2c20->push_back(exktsubjet_mv2c20);
 
       v_jet_ExKtbb_Hbb_DoubleMV2c20->push_back(bjet->auxdata<double>("ExKtbb_Hbb_DoubleMV2c20"));
 
@@ -2747,8 +2711,9 @@ StatusCode btagIBLAnalysisAlg::execute() {
   truth_muons.clear();
   selJets.clear();
 
-  // addition from Dan: clear clusters
+  // addition from Dan: clear branch collections
   m_cluster_branches.clear();
+  m_exkt_branches.clear();
 
   return StatusCode::SUCCESS;
 }
@@ -2990,12 +2955,6 @@ void btagIBLAnalysisAlg :: clearvectors() {
   v_jet_msv_vtx_chi->clear();
   v_jet_msv_vtx_ndf->clear();
 
-  v_jet_exktsubjet_pt->clear();
-  v_jet_exktsubjet_eta->clear();
-  v_jet_exktsubjet_phi->clear();
-  v_jet_exktsubjet_m->clear();
-  v_jet_exktsubjet_ntrk->clear();
-  v_jet_exktsubjet_mv2c20->clear();
   v_jet_ExKtbb_Hbb_DoubleMV2c20->clear();
   v_jet_ExKtbb_Hbb_SingleMV2c20->clear();
   v_jet_ExKtbb_Hbb_MV2Only->clear();
