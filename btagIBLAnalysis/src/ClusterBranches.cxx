@@ -5,8 +5,6 @@
 #include "AthContainers/exceptions.h"
 #include "TTree.h"
 
-// TODO: remove iostream (to make sure we're not using it!)
-// #include <iostream>
 #include <string>
 #include <stdexcept>
 
@@ -58,7 +56,6 @@ ClusterBranches::~ClusterBranches()
 }
 
 void ClusterBranches::set_tree(TTree& output_tree) const {
-  std::cout << "setting tree!" << std::endl;
   std::string prefix = "jet_cluster_";
 #define ADD_SIMPLE(nm) \
   output_tree.Branch((prefix + #nm).c_str(), &m_branches->nm)
@@ -84,7 +81,6 @@ void ClusterBranches::set_tree(TTree& output_tree) const {
 }
 
 void ClusterBranches::fill(const xAOD::JetConstituentVector& constituents) {
-  std::cout << "filling constituents!" << std::endl;
   std::vector<float> pt;
   std::vector<float> eta;
   std::vector<float> phi;
@@ -154,7 +150,6 @@ void ClusterBranches::fill(const xAOD::JetConstituentVector& constituents) {
 }
 
 void ClusterBranches::clear() {
-  std::cout << "clearing constituents!" << std::endl;
   m_branches->pt->clear();
   m_branches->eta->clear();
   m_branches->phi->clear();
