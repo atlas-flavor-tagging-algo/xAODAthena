@@ -30,6 +30,10 @@ struct SubjetBranchBuffer
   // std::vector<std::vector<float> >* jf_phi;
   // std::vector<std::vector<float> >* jf_theta;
 
+  // IP3D
+  std::vector<std::vector<float> >* ip3d_pb;
+  std::vector<std::vector<float> >* ip3d_pc;
+  std::vector<std::vector<float> >* ip3d_pu;
 
 };
 

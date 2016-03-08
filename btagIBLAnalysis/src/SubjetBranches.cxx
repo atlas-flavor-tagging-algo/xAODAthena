@@ -10,6 +10,8 @@
 namespace {
   void add_jetfitter(const std::vector<const xAOD::Jet*>& subjets,
                      SubjetBranchBuffer&);
+  void add_ip3d(const std::vector<const xAOD::Jet*>& subjets,
+                SubjetBranchBuffer&);
 }
 
 SubjetBranches::SubjetBranches():
@@ -35,6 +37,10 @@ SubjetBranches::SubjetBranches():
   m_branches->jf_nvtx1t = new         std::vector<std::vector<int> >;
   m_branches->jf_n2t = new            std::vector<std::vector<int> >;
   m_branches->jf_VTXsize = new        std::vector<std::vector<int> >;
+
+  m_branches->ip3d_pb = new std::vector<std::vector<float> >;
+  m_branches->ip3d_pc = new std::vector<std::vector<float> >;
+  m_branches->ip3d_pu = new std::vector<std::vector<float> >;
 }
 
 SubjetBranches::~SubjetBranches()
@@ -59,6 +65,10 @@ SubjetBranches::~SubjetBranches()
   delete m_branches->jf_nvtx1t;
   delete m_branches->jf_n2t;
   delete m_branches->jf_VTXsize;
+
+  delete m_branches->ip3d_pb;
+  delete m_branches->ip3d_pc;
+  delete m_branches->ip3d_pu;
 
   delete m_branches;
 }
@@ -90,6 +100,11 @@ void SubjetBranches::set_tree(TTree& output_tree,
   ADD_SIMPLE(jf_nvtx1t);
   ADD_SIMPLE(jf_n2t);
   ADD_SIMPLE(jf_VTXsize);
+
+  // IP3D
+  ADD_SIMPLE(ip3d_pb);
+  ADD_SIMPLE(ip3d_pc);
+  ADD_SIMPLE(ip3d_pu);
 #undef ADD_SIMPLE
 }
 
@@ -121,6 +136,7 @@ void SubjetBranches::fill(const std::vector<const xAOD::Jet*>& subjets) {
 
   // add other tagger info
   add_jetfitter(subjets, *m_branches);
+  add_ip3d(subjets, *m_branches);
 }
 
 void SubjetBranches::clear() {
@@ -148,6 +164,10 @@ void SubjetBranches::clear() {
   CLEAR(jf_nvtx1t);
   CLEAR(jf_n2t);
   CLEAR(jf_VTXsize);
+
+  CLEAR(ip3d_pb);
+  CLEAR(ip3d_pc);
+  CLEAR(ip3d_pu);
 #undef CLEAR
 }
 
@@ -178,8 +198,7 @@ namespace {
     // std::vector<float> jf_phi;
     // std::vector<float> jf_theta;
     for (const auto* jet: subjets) {
-      using namespace xAOD;
-      const BTagging* bjet = jet->btagging();
+      const xAOD::BTagging* bjet = jet->btagging();
       // get vertex counts
       int nvtx = DUMMY_INT;
       int nvtx1t = DUMMY_INT;
@@ -242,4 +261,21 @@ namespace {
 #undef PUSH
 
   }
+
+  void add_ip3d(const std::vector<const xAOD::Jet*>& subjets,
+                SubjetBranchBuffer& buffer) {
+    std::vector<float> pb;
+    std::vector<float> pc;
+    std::vector<float> pu;
+    for (const auto* jet: subjets) {
+      const xAOD::BTagging* bjet = jet->btagging();
+      pb.push_back(bjet->IP3D_pb());
+      pc.push_back(bjet->IP3D_pc());
+      pu.push_back(bjet->IP3D_pu());
+    }
+    buffer.ip3d_pb->push_back(std::move(pb));
+    buffer.ip3d_pc->push_back(std::move(pc));
+    buffer.ip3d_pu->push_back(std::move(pu));
+  }
+
 }
