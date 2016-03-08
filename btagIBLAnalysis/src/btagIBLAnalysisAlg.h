@@ -4,6 +4,7 @@
 // Additions from Dan: classes to manage branches
 #include "ClusterBranches.hh"
 #include "SubjetBranches.hh"
+#include "TrackBranches.hh"
 
 #include "AthenaBaseComps/AthHistogramAlgorithm.h"
 #include "GaudiKernel/ToolHandle.h" 
