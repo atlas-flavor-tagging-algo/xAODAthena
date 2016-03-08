@@ -399,6 +399,7 @@ StatusCode btagIBLAnalysisAlg::initialize() {
   v_jet_trk_eta = new std::vector<std::vector<float> >();
   v_jet_trk_theta = new std::vector<std::vector<float> >();
   v_jet_trk_phi = new std::vector<std::vector<float> >();
+  v_jet_trk_qoverp = new std::vector<std::vector<float> >();
   v_jet_trk_dr = new std::vector<std::vector<float> >();
   v_jet_trk_assoc_msv = new std::vector<std::vector<int> >();   // mod nikola
   v_jet_trk_chi2 = new std::vector<std::vector<float> >();
@@ -725,6 +726,7 @@ StatusCode btagIBLAnalysisAlg::initialize() {
     tree->Branch("jet_trk_eta", &v_jet_trk_eta);
     tree->Branch("jet_trk_theta", &v_jet_trk_theta);
     tree->Branch("jet_trk_phi", &v_jet_trk_phi);
+    tree->Branch("jet_trk_qoverp", &v_jet_trk_qoverp);
     tree->Branch("jet_trk_dr", &v_jet_trk_dr);
     tree->Branch("jet_trk_assoc_msv", &v_jet_trk_assoc_msv);    // mod nikola
     tree->Branch("jet_trk_chi2", &v_jet_trk_chi2);
@@ -2033,6 +2035,7 @@ StatusCode btagIBLAnalysisAlg::execute() {
     std::vector<float> j_trk_eta;
     std::vector<float> j_trk_theta;
     std::vector<float> j_trk_phi;
+    std::vector<float> j_trk_qoverp;
     std::vector<float> j_trk_dr; // mod nikola
     std::vector<int> j_trk_assoc_msv; // mod nikola
     std::vector<float> j_trk_chi2;
@@ -2402,6 +2405,7 @@ StatusCode btagIBLAnalysisAlg::execute() {
       j_trk_eta.push_back(tmpTrk->eta());
       j_trk_theta.push_back(tmpTrk->theta());
       j_trk_phi.push_back(tmpTrk->phi());
+      j_trk_qoverp.push_back(tmpTrk->qOverP());
       j_trk_chi2.push_back(tmpTrk->chiSquared());
       j_trk_ndf.push_back(tmpTrk->numberDoF());
 
@@ -2616,6 +2620,7 @@ StatusCode btagIBLAnalysisAlg::execute() {
     v_jet_trk_eta->push_back(j_trk_eta);
     v_jet_trk_theta->push_back(j_trk_theta);
     v_jet_trk_phi->push_back(j_trk_phi);
+    v_jet_trk_qoverp->push_back(j_trk_qoverp);
     v_jet_trk_dr->push_back(j_trk_dr);
     v_jet_trk_assoc_msv->push_back(j_trk_assoc_msv);
     v_jet_trk_chi2->push_back(j_trk_chi2);
@@ -2966,6 +2971,7 @@ void btagIBLAnalysisAlg :: clearvectors() {
   v_jet_trk_eta->clear();
   v_jet_trk_theta->clear();
   v_jet_trk_phi->clear();
+  v_jet_trk_qoverp->clear();
   v_jet_trk_dr->clear();
   v_jet_trk_assoc_msv->clear();
   v_jet_trk_chi2->clear();
