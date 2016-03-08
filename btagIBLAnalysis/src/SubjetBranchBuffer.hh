@@ -8,7 +8,29 @@ struct SubjetBranchBuffer
   std::vector<std::vector<float> >* phi;
   std::vector<std::vector<float> >* m;
   std::vector<std::vector<int> >* ntrk;
+
   std::vector<std::vector<float> >* mv2c20;
+
+  // jetfitter
+  std::vector<std::vector<float> >* jf_m;
+  std::vector<std::vector<float> >* jf_mUncorr;
+  std::vector<std::vector<float> >* jf_efc;
+  std::vector<std::vector<float> >* jf_deta;
+  std::vector<std::vector<float> >* jf_dphi;
+  std::vector<std::vector<float> >* jf_dRFlightDir;
+  std::vector<std::vector<int> >*   jf_ntrkAtVx;
+  std::vector<std::vector<int> >*   jf_nvtx;
+  std::vector<std::vector<float> >* jf_sig3d;
+  std::vector<std::vector<int> >*   jf_nvtx1t;
+  std::vector<std::vector<int> >*   jf_n2t;
+  std::vector<std::vector<int> >*   jf_VTXsize;
+  // TODO: Missing some clustered vertex information here
+
+  // TODO: figure out what these variables are all about
+  // std::vector<std::vector<float> >* jf_phi;
+  // std::vector<std::vector<float> >* jf_theta;
+
+
 };
 
 #endif
