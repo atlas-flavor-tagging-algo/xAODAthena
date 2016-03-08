@@ -193,10 +193,20 @@ void SubjetBranches::clear() {
   CLEAR(jf_n2t);
   CLEAR(jf_VTXsize);
 
+  // IP3D
   CLEAR(ip3d_pb);
   CLEAR(ip3d_pc);
   CLEAR(ip3d_pu);
   CLEAR(ip3d_ntrk);
+
+  // SV1
+  CLEAR(sv1_ntrkv);
+  CLEAR(sv1_n2t);
+  CLEAR(sv1_m);
+  CLEAR(sv1_efc);
+  CLEAR(sv1_Nvtx);
+  CLEAR(sv1_normdist);
+
 #undef CLEAR
 }
 
