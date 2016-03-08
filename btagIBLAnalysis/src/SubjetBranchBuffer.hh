@@ -6,7 +6,7 @@ struct SubjetBranchBuffer
   std::vector<std::vector<float> >* pt;
   std::vector<std::vector<float> >* eta;
   std::vector<std::vector<float> >* phi;
-  std::vector<std::vector<float> >* mass;
+  std::vector<std::vector<float> >* m;
   std::vector<std::vector<int> >* ntrk;
   std::vector<std::vector<float> >* mv2c20;
 };

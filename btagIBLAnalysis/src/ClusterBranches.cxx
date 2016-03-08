@@ -14,7 +14,7 @@ ClusterBranches::ClusterBranches():
   m_branches->pt = new std::vector<std::vector<float> >;
   m_branches->eta = new std::vector<std::vector<float> >;
   m_branches->phi = new std::vector<std::vector<float> >;
-  m_branches->energy = new std::vector<std::vector<float> >;
+  m_branches->e = new std::vector<std::vector<float> >;
 
   m_branches->clusterSize = new std::vector<std::vector<unsigned int> >;
 
@@ -37,7 +37,7 @@ ClusterBranches::~ClusterBranches()
   delete m_branches->pt;
   delete m_branches->eta;
   delete m_branches->phi;
-  delete m_branches->energy;
+  delete m_branches->e;
 
   delete m_branches->clusterSize;
   delete m_branches->ISOLATION;
@@ -63,7 +63,7 @@ void ClusterBranches::set_tree(TTree& output_tree) const {
   ADD_SIMPLE(pt);
   ADD_SIMPLE(eta);
   ADD_SIMPLE(phi);
-  ADD_SIMPLE(energy);
+  ADD_SIMPLE(e);
   // cluster attributes
   ADD_SIMPLE(clusterSize);
   ADD_SIMPLE(ISOLATION);
@@ -84,18 +84,18 @@ void ClusterBranches::fill(const xAOD::JetConstituentVector& constituents) {
   std::vector<float> pt;
   std::vector<float> eta;
   std::vector<float> phi;
-  std::vector<float> energy;
+  std::vector<float> e;
 
   for (const auto& cluster: constituents) {
     pt.push_back(cluster->pt());
     eta.push_back(cluster->eta());
     phi.push_back(cluster->phi());
-    energy.push_back(cluster->e());
+    e.push_back(cluster->e());
   }
   m_branches->pt->push_back(std::move(pt));
   m_branches->eta->push_back(std::move(eta));
   m_branches->phi->push_back(std::move(phi));
-  m_branches->energy->push_back(std::move(energy));
+  m_branches->e->push_back(std::move(e));
 
   // get aux attributes
   std::vector<unsigned int> clusterSize;
@@ -153,7 +153,7 @@ void ClusterBranches::clear() {
   m_branches->pt->clear();
   m_branches->eta->clear();
   m_branches->phi->clear();
-  m_branches->energy->clear();
+  m_branches->e->clear();
 
   m_branches->clusterSize->clear();
   m_branches->ISOLATION     ->clear();

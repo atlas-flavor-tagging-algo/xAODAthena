@@ -7,7 +7,7 @@ struct ClusterBranchBuffer {
   std::vector<std::vector<float> >* pt;
   std::vector<std::vector<float> >* eta;
   std::vector<std::vector<float> >* phi;
-  std::vector<std::vector<float> >* energy;
+  std::vector<std::vector<float> >* e;
 
   std::vector<std::vector<unsigned int> >* clusterSize;
   std::vector<std::vector<float> >* ISOLATION;
