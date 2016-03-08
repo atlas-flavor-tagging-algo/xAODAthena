@@ -12,6 +12,8 @@ namespace {
                      SubjetBranchBuffer&);
   void add_ip3d(const std::vector<const xAOD::Jet*>& subjets,
                 SubjetBranchBuffer&);
+  void add_sv1(const std::vector<const xAOD::Jet*>& subjets,
+               SubjetBranchBuffer&);
 }
 
 SubjetBranches::SubjetBranches():
@@ -41,6 +43,14 @@ SubjetBranches::SubjetBranches():
   m_branches->ip3d_pb = new std::vector<std::vector<float> >;
   m_branches->ip3d_pc = new std::vector<std::vector<float> >;
   m_branches->ip3d_pu = new std::vector<std::vector<float> >;
+  m_branches->ip3d_ntrk = new std::vector<std::vector<int> >;
+
+  m_branches->sv1_ntrkv = new std::vector<std::vector<int> >;
+  m_branches->sv1_n2t = new std::vector<std::vector<int> >;
+  m_branches->sv1_m = new std::vector<std::vector<float> >;
+  m_branches->sv1_efc = new std::vector<std::vector<float> >;
+  m_branches->sv1_Nvtx = new std::vector<std::vector<int> >;
+  m_branches->sv1_normdist = new std::vector<std::vector<float> >;
 }
 
 SubjetBranches::~SubjetBranches()
@@ -69,6 +79,14 @@ SubjetBranches::~SubjetBranches()
   delete m_branches->ip3d_pb;
   delete m_branches->ip3d_pc;
   delete m_branches->ip3d_pu;
+  delete m_branches->ip3d_ntrk;
+
+  delete m_branches->sv1_ntrkv;
+  delete m_branches->sv1_n2t;
+  delete m_branches->sv1_m;
+  delete m_branches->sv1_efc;
+  delete m_branches->sv1_Nvtx;
+  delete m_branches->sv1_normdist;
 
   delete m_branches;
 }
@@ -105,6 +123,15 @@ void SubjetBranches::set_tree(TTree& output_tree,
   ADD_SIMPLE(ip3d_pb);
   ADD_SIMPLE(ip3d_pc);
   ADD_SIMPLE(ip3d_pu);
+  ADD_SIMPLE(ip3d_ntrk);
+
+  // SV1
+  ADD_SIMPLE(sv1_ntrkv);
+  ADD_SIMPLE(sv1_n2t);
+  ADD_SIMPLE(sv1_m);
+  ADD_SIMPLE(sv1_efc);
+  ADD_SIMPLE(sv1_Nvtx);
+  ADD_SIMPLE(sv1_normdist);
 #undef ADD_SIMPLE
 }
 
@@ -137,6 +164,7 @@ void SubjetBranches::fill(const std::vector<const xAOD::Jet*>& subjets) {
   // add other tagger info
   add_jetfitter(subjets, *m_branches);
   add_ip3d(subjets, *m_branches);
+  add_sv1(subjets, *m_branches);
 }
 
 void SubjetBranches::clear() {
@@ -168,6 +196,7 @@ void SubjetBranches::clear() {
   CLEAR(ip3d_pb);
   CLEAR(ip3d_pc);
   CLEAR(ip3d_pu);
+  CLEAR(ip3d_ntrk);
 #undef CLEAR
 }
 
@@ -176,7 +205,7 @@ void SubjetBranches::clear() {
 // filler functions
 
 namespace {
-  typedef std::vector<ElementLink<xAOD::BTagVertexContainer> > Vertices;
+  typedef std::vector<ElementLink<xAOD::BTagVertexContainer> > BTagVertices;
   void add_jetfitter(const std::vector<const xAOD::Jet*>& subjets,
                      SubjetBranchBuffer& buffer) {
 
@@ -226,7 +255,7 @@ namespace {
         bjet->taggerInfo(ntrkAtVx, xAOD::JetFitter_nTracksAtVtx);
         bjet->taggerInfo(sig3d, xAOD::JetFitter_significance3d);
         bjet->taggerInfo(n2t, xAOD::JetFitter_N2Tpair);
-        VTXsize = bjet->auxdata<Vertices>("JetFitter_JFvertices").size();
+        VTXsize = bjet->auxdata<BTagVertices>("JetFitter_JFvertices").size();
       }
       // fill for this subjet
 #define PUSH(var) jf_ ## var.push_back(var)
@@ -262,20 +291,77 @@ namespace {
 
   }
 
+  typedef std::vector<ElementLink< xAOD::TrackParticleContainer> > Tracks;
   void add_ip3d(const std::vector<const xAOD::Jet*>& subjets,
                 SubjetBranchBuffer& buffer) {
     std::vector<float> pb;
     std::vector<float> pc;
     std::vector<float> pu;
+    std::vector<int> ntrk;
     for (const auto* jet: subjets) {
       const xAOD::BTagging* bjet = jet->btagging();
-      pb.push_back(bjet->IP3D_pb());
-      pc.push_back(bjet->IP3D_pc());
-      pu.push_back(bjet->IP3D_pu());
+      int n_trk = bjet->auxdata<Tracks>("IP3D_TrackParticleLinks").size();
+      ntrk.push_back(n_trk);
+      if (n_trk > 0) {
+        pb.push_back(bjet->IP3D_pb());
+        pc.push_back(bjet->IP3D_pc());
+        pu.push_back(bjet->IP3D_pu());
+      } else {
+        pb.push_back(DUMMY_FLOAT);
+        pc.push_back(DUMMY_FLOAT);
+        pu.push_back(DUMMY_FLOAT);
+      }
     }
+    buffer.ip3d_ntrk->push_back(std::move(ntrk));
     buffer.ip3d_pb->push_back(std::move(pb));
     buffer.ip3d_pc->push_back(std::move(pc));
     buffer.ip3d_pu->push_back(std::move(pu));
+  }
+
+  typedef std::vector<ElementLink<xAOD::VertexContainer > > Vertices;
+  void add_sv1(const std::vector<const xAOD::Jet*>& subjets,
+               SubjetBranchBuffer& buffer) {
+    std::vector<int> sv1_ntrkv;
+    std::vector<int> sv1_n2t;
+    std::vector<int> sv1_Nvtx;
+    std::vector<float> sv1_m;
+    std::vector<float> sv1_efc;
+    std::vector<float> sv1_normdist;
+    for (const auto* jet: subjets) {
+      const xAOD::BTagging* bjet = jet->btagging();
+      int n_vx = bjet->auxdata<Vertices>("SV1_vertices").size();
+      sv1_Nvtx.push_back(n_vx);
+
+      int ntrkv = DUMMY_INT;
+      int n2t = DUMMY_INT;
+      float m = DUMMY_FLOAT;
+      float efc = DUMMY_FLOAT;
+      float normdist = DUMMY_FLOAT;
+      if (n_vx > 0) {
+        bjet->taggerInfo(ntrkv, xAOD::SV1_NGTinSvx);
+        bjet->taggerInfo(n2t, xAOD::SV1_N2Tpair);
+        bjet->taggerInfo(m, xAOD::SV1_masssvx);
+        bjet->taggerInfo(efc, xAOD::SV1_efracsvx);
+        bjet->taggerInfo(normdist, xAOD::SV1_normdist);
+      }
+      // fill for this subjet
+#define PUSH(var) sv1_ ## var.push_back(var)
+      PUSH(ntrkv);
+      PUSH(n2t);
+      PUSH(m);
+      PUSH(efc);
+      PUSH(normdist);
+#undef PUSH
+    }
+    // fill for this fat jet
+#define PUSH(var) buffer.var->push_back(std::move(var))
+    PUSH(sv1_ntrkv);
+    PUSH(sv1_n2t);
+    PUSH(sv1_Nvtx);
+    PUSH(sv1_m);
+    PUSH(sv1_efc);
+    PUSH(sv1_normdist);
+#undef PUSH
   }
 
 }

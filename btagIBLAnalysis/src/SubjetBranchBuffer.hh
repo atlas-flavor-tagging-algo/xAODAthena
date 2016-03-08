@@ -34,6 +34,16 @@ struct SubjetBranchBuffer
   std::vector<std::vector<float> >* ip3d_pb;
   std::vector<std::vector<float> >* ip3d_pc;
   std::vector<std::vector<float> >* ip3d_pu;
+  std::vector<std::vector<int> >* ip3d_ntrk;
+
+  // SV1
+  // std::vector<std::vector<float> >* sv1_ntrkj; // this one is garbage
+  std::vector<std::vector<int> >* sv1_ntrkv;
+  std::vector<std::vector<int> >*   sv1_n2t;
+  std::vector<std::vector<float> >* sv1_m;
+  std::vector<std::vector<float> >* sv1_efc;
+  std::vector<std::vector<int> >*   sv1_Nvtx;
+  std::vector<std::vector<float> >* sv1_normdist;
 
 };
 
