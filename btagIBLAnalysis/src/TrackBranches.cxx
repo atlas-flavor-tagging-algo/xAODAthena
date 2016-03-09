@@ -1,43 +1,64 @@
 #include "TrackBranches.hh"
 #include "TrackBranchBuffer.hh"
 
-
 #include "xAODTracking/TrackParticle.h"
 #include "TTree.h"
 
 #include <string>
+#include <map>
+
+namespace {
+  const std::vector<std::string> TRK_PAR = {
+    "d0","z0", "phi", "theta", "qoverp"};
+}
 
 TrackBranches::TrackBranches():
   m_branches(new TrackBranchBuffer)
 {
-  m_branches->dummy = new std::vector<std::vector<float> >;
+  typedef std::vector<std::vector<float> > VVF;
+  size_t n_pars = TRK_PAR.size();
+  for (size_t iii = 0; iii < n_pars; iii++) {
+    for (size_t jjj = iii; jjj < n_pars; jjj++) {
+      m_branches->cov[std::make_pair(iii,jjj)] = new VVF;
+    }
+  }
 }
 
 TrackBranches::~TrackBranches()
 {
-  delete m_branches->dummy;
-
+  for (auto& branch: m_branches->cov) {
+    delete branch.second;
+  }
   delete m_branches;
 }
 
 void TrackBranches::set_tree(TTree& output_tree,
                              const std::string& prefix) const {
-#define ADD_SIMPLE(nm) \
-  output_tree.Branch((prefix + #nm).c_str(), &m_branches->nm)
-  // basic kinematics
-  ADD_SIMPLE(dummy);
-#undef ADD_SIMPLE
+  for (auto& pair: m_branches->cov) {
+    std::string par1 = TRK_PAR.at(pair.first.first);
+    std::string par2 = TRK_PAR.at(pair.first.second);
+    std::string branch_name = prefix + "cov_" + par1 + par2;
+    output_tree.Branch(branch_name.c_str(), &pair.second);
+  }
 }
 
 void TrackBranches::fill(const TrackBranches::Tracks& tracks) {
-  std::vector<float> dummy;
-
-  for (const auto* track: tracks) {
-    dummy.push_back(track->pt());
+  // add a vector to each branch
+  for (auto& pair: m_branches->cov) {
+    pair.second->push_back(std::vector<float>());
   }
-  m_branches->dummy->push_back(std::move(dummy));
+  for (const auto* track: tracks) {
+    const auto cov_matrix = track->definingParametersCovMatrix();
+    for (auto& pair: m_branches->cov) {
+      const auto& idx = pair.first;
+      float val = cov_matrix(idx.first, idx.second);
+      pair.second->back().push_back(val);
+    }
+  }
 }
 
 void TrackBranches::clear() {
-  m_branches->dummy->clear();
+  for (auto& pair: m_branches->cov) {
+    pair.second->clear();
+  }
 }

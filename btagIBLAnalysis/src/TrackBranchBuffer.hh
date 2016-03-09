@@ -2,9 +2,12 @@
 #define TRACK_BRANCH_BUFFER_HH
 
 #include <vector>
+#include <map>
+#include <utility>
 
 struct TrackBranchBuffer {
-  std::vector<std::vector<float> >* dummy;
+  // map of covariance branches
+  std::map< std::pair<int, int>,  std::vector<std::vector<float> >*> cov;
 };
 
 #endif
