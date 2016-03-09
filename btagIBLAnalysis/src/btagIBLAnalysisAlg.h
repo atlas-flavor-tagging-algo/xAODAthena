@@ -7,7 +7,7 @@
 #include "TrackBranches.hh"
 
 #include "AthenaBaseComps/AthHistogramAlgorithm.h"
-#include "GaudiKernel/ToolHandle.h" 
+#include "GaudiKernel/ToolHandle.h"
 
 #include "TFile.h"
 #include "TTree.h"
@@ -425,8 +425,8 @@ class btagIBLAnalysisAlg: public ::AthHistogramAlgorithm {
   bool m_cleanJets;
 
   std::string m_triggerLogic;
-  
- private: 
+
+ private:
 
   // additions by Dan: branch collections
   // cluster dumper

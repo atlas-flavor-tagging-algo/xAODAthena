@@ -88,6 +88,7 @@ bool isFromWZ( const xAOD::TruthParticle* particle ) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 btagIBLAnalysisAlg::btagIBLAnalysisAlg( const std::string& name, ISvcLocator *pSvcLocator ) :
   AthHistogramAlgorithm(name, pSvcLocator),
+  m_SMT(false),
   m_stream("BTAGSTREAM"),
   m_cluster_branches(),
   m_exkt_branches(),
@@ -99,8 +100,7 @@ btagIBLAnalysisAlg::btagIBLAnalysisAlg( const std::string& name, ISvcLocator *pS
   m_TightTrackVertexAssociationTool(""),
   m_tdt("Trig::TrigDecisionTool/TrigDecisionTool"),
   m_GRLSelectionTool("GoodRunsListSelectionTool/GoodRunsListSelectionTool", this),
-  m_jvt(""),
-  m_SMT(false)
+  m_jvt("")
 {
   m_triggerLogic="";
   declareProperty( "Stream", m_stream );
@@ -2432,7 +2432,7 @@ StatusCode btagIBLAnalysisAlg::execute() {
 
         // loop over vertices
         if (msvVertices.size() > 0) {
-          for (int vtx = 0; vtx < msvVertices.size(); vtx++) {
+          for (size_t vtx = 0; vtx < msvVertices.size(); vtx++) {
             if (msvVertices.size() >= 10) continue;
 
             // loop over tracks
