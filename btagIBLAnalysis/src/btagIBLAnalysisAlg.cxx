@@ -92,6 +92,7 @@ btagIBLAnalysisAlg::btagIBLAnalysisAlg( const std::string& name, ISvcLocator *pS
   m_cluster_branches(),
   m_exkt_branches(),
   m_trkjet_branches(),
+  m_track_branches(),
   m_jetCleaningTool("JetCleaningTool/JetCleaningTool", this),
   m_jetCalibrationTool(""),
   m_InDetTrackSelectorTool(""),
@@ -192,6 +193,7 @@ StatusCode btagIBLAnalysisAlg::initialize() {
   m_cluster_branches.set_tree(*tree);
   m_exkt_branches.set_tree(*tree, "jet_exktsubjet_");
   m_trkjet_branches.set_tree(*tree, "jet_trkjet_");
+  m_track_branches.set_tree(*tree, "jet_trk_");
 
   // Setup branches
   v_jet_pt = new std::vector<float>(); //v_jet_pt->reserve(15);
@@ -1593,11 +1595,14 @@ StatusCode btagIBLAnalysisAlg::execute() {
       assocTracks = bjet->auxdata<std::vector<ElementLink<xAOD::TrackParticleContainer> > >("BTagTrackToJetAssociator");
     }
 
+    // build vector of tracks to simplify interface
+    std::vector<const xAOD::TrackParticle*> associated_tracks;
     // temporary track loop - sums up the 4vectors of all valid b-tag tracks and outputs
     TLorentzVector pseudoTrackJet(0, 0, 0, 0);
     for (unsigned int iT = 0; iT < assocTracks.size(); iT++) {
       if (!assocTracks.at(iT).isValid()) continue;
       const xAOD::TrackParticle *tmpTrk = *(assocTracks.at(iT));
+      associated_tracks.push_back(tmpTrk);
 
       if (m_InDetTrackSelectorTool->accept(*tmpTrk, myVertex) && m_TightTrackVertexAssociationTool->isCompatible(*tmpTrk, *myVertex) ) {
         TLorentzVector tmpTrack(0, 0, 0, 0);
@@ -2389,6 +2394,8 @@ StatusCode btagIBLAnalysisAlg::execute() {
 
     ////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////
+    // Addition from Dan: first fill my track branches
+    m_track_branches.fill(associated_tracks);
     // MAIN TRACK LOOP
     for (unsigned int iT = 0; iT < assocTracks.size(); iT++) {
       // std::cout << " .... trk link: " << iT << std::endl;
@@ -2680,6 +2687,8 @@ StatusCode btagIBLAnalysisAlg::execute() {
   // addition from Dan: clear branch collections
   m_cluster_branches.clear();
   m_exkt_branches.clear();
+  m_trkjet_branches.clear();
+  m_track_branches.clear();
 
   return StatusCode::SUCCESS;
 }

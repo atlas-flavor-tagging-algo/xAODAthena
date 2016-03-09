@@ -3,12 +3,10 @@
 
 class TTree;
 
-#include "xAODTracking/TrackParticle.h"
-#include "xAODTracking/TrackParticleContainer.h"
-
-// namespace xAOD {
-//   class TrackParticleContainer;
-// }
+namespace xAOD {
+  class TrackParticle_v1;
+  typedef TrackParticle_v1 TrackParticle;
+}
 
 #include <vector>
 #include <string>
@@ -20,7 +18,7 @@ struct TrackBranchBuffer;
 class TrackBranches
 {
 public:
-  typedef std::vector<ElementLink<xAOD::TrackParticleContainer > > Tracks;
+  typedef std::vector<const xAOD::TrackParticle*> Tracks;
   // might want to add a prefix to the constructor for the tree branches
   TrackBranches();
   ~TrackBranches();

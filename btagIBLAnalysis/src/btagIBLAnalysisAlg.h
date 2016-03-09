@@ -434,6 +434,8 @@ class btagIBLAnalysisAlg: public ::AthHistogramAlgorithm {
   // subjet dumper
   SubjetBranches m_exkt_branches;
   SubjetBranches m_trkjet_branches;
+  // track dumper
+  TrackBranches m_track_branches;
 
   /// tool handle for jet cleaning tool
   ToolHandle< IJetSelector > m_jetCleaningTool;
