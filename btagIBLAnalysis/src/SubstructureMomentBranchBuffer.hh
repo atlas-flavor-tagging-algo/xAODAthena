@@ -4,13 +4,13 @@
 #include <vector>
 
 struct SubstructureMomentBranchBuffer {
-  std::vector<float>* Tau21;
-  std::vector<float>* C1;
-  std::vector<float>* C2;
-  std::vector<float>* C1_Beta2;
-  std::vector<float>* C2_Beta2;
-  std::vector<float>* D2;
-  std::vector<float>* D2_Beta2;
+  std::vector<float>* tau21;
+  std::vector<float>* c1;
+  std::vector<float>* c2;
+  std::vector<float>* c1_beta2;
+  std::vector<float>* c2_beta2;
+  std::vector<float>* d2;
+  std::vector<float>* d2_beta2;
 };
 
 #endif // SUBSTRUCTUREMOMENT_BRANCH_BUFFER_HH
