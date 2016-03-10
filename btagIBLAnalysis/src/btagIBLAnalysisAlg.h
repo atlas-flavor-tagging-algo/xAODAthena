@@ -5,6 +5,7 @@
 #include "ClusterBranches.hh"
 #include "SubjetBranches.hh"
 #include "TrackBranches.hh"
+#include "SubstructureMomentBranches.hh"
 
 #include "AthenaBaseComps/AthHistogramAlgorithm.h"
 #include "GaudiKernel/ToolHandle.h"
@@ -431,6 +432,7 @@ class btagIBLAnalysisAlg: public ::AthHistogramAlgorithm {
   // additions by Dan: branch collections
   // cluster dumper
   ClusterBranches m_cluster_branches;
+  SubstructureMomentBranches m_substructure_moment_branches;
   // subjet dumper
   SubjetBranches m_exkt_branches;
   SubjetBranches m_trkjet_branches;

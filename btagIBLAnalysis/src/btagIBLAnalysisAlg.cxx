@@ -91,6 +91,7 @@ btagIBLAnalysisAlg::btagIBLAnalysisAlg( const std::string& name, ISvcLocator *pS
   m_SMT(false),
   m_stream("BTAGSTREAM"),
   m_cluster_branches(),
+  m_substructure_moment_branches(),
   m_exkt_branches(),
   m_trkjet_branches(),
   m_track_branches(),
@@ -191,6 +192,7 @@ StatusCode btagIBLAnalysisAlg::initialize() {
 
   // addition from Dan: create cluster branches
   m_cluster_branches.set_tree(*tree);
+  m_substructure_moment_branches.set_tree(*tree);
   m_exkt_branches.set_tree(*tree, "jet_exktsubjet_");
   m_trkjet_branches.set_tree(*tree, "jet_trkjet_");
   m_track_branches.set_tree(*tree, "jet_trk_");
@@ -1133,6 +1135,7 @@ StatusCode btagIBLAnalysisAlg::execute() {
 
     // addition from Dan: fill clusters
     m_cluster_branches.fill(jet->getConstituents());
+    m_substructure_moment_branches.fill(*jet);
 
     // additions by nikola
     const xAOD::Jet *jet_parent = 0;
@@ -2686,6 +2689,7 @@ StatusCode btagIBLAnalysisAlg::execute() {
 
   // addition from Dan: clear branch collections
   m_cluster_branches.clear();
+  m_substructure_moment_branches.clear();
   m_exkt_branches.clear();
   m_trkjet_branches.clear();
   m_track_branches.clear();
