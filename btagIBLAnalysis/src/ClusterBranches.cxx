@@ -55,10 +55,18 @@ ClusterBranches::~ClusterBranches()
   delete m_branches;
 }
 
+namespace {
+  // branch name function (lowercase the variable name)
+  std::string brnm(const std::string& pfx, std::string in) {
+    std::transform(in.begin(), in.end(), in.begin(), ::tolower);
+    return pfx + in;
+  }
+}
+
 void ClusterBranches::set_tree(TTree& output_tree) const {
   std::string prefix = "jet_cluster_";
 #define ADD_SIMPLE(nm) \
-  output_tree.Branch((prefix + #nm).c_str(), &m_branches->nm)
+  output_tree.Branch(brnm(prefix, #nm).c_str(), &m_branches->nm)
   // basic kinematics
   ADD_SIMPLE(pt);
   ADD_SIMPLE(eta);
