@@ -4,7 +4,7 @@
 // Additions from Dan: classes to manage branches
 #include "ClusterBranches.hh"
 #include "SubjetBranches.hh"
-#include "TrackBranches.hh"
+#include "TrackCovBranches.hh"
 #include "SubstructureMomentBranches.hh"
 
 #include "AthenaBaseComps/AthHistogramAlgorithm.h"
@@ -431,13 +431,14 @@ class btagIBLAnalysisAlg: public ::AthHistogramAlgorithm {
 
   // additions by Dan: branch collections
   // cluster dumper
+  bool m_dumpCaloInfo;
   ClusterBranches m_cluster_branches;
   SubstructureMomentBranches m_substructure_moment_branches;
   // subjet dumper
   SubjetBranches m_exkt_branches;
   SubjetBranches m_trkjet_branches;
   // track dumper
-  TrackBranches m_track_branches;
+  TrackCovBranches m_track_branches;
 
   /// tool handle for jet cleaning tool
   ToolHandle< IJetSelector > m_jetCleaningTool;

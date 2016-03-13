@@ -90,6 +90,7 @@ btagIBLAnalysisAlg::btagIBLAnalysisAlg( const std::string& name, ISvcLocator *pS
   AthHistogramAlgorithm(name, pSvcLocator),
   m_SMT(false),
   m_stream("BTAGSTREAM"),
+  m_dumpCaloInfo(false),
   m_cluster_branches(),
   m_substructure_moment_branches(),
   m_exkt_branches(),
@@ -127,6 +128,8 @@ btagIBLAnalysisAlg::btagIBLAnalysisAlg( const std::string& name, ISvcLocator *pS
   declareProperty( "JetPtCut", m_jetPtCut = 20.e3 );
 
   declareProperty( "TriggerLogic", m_triggerLogic );
+
+  declareProperty( "DumpCaloInfo", m_dumpCaloInfo);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -191,8 +194,10 @@ StatusCode btagIBLAnalysisAlg::initialize() {
   ATH_CHECK(m_tdt.retrieve());
 
   // addition from Dan: create cluster branches
-  m_cluster_branches.set_tree(*tree);
-  m_substructure_moment_branches.set_tree(*tree);
+  if (m_dumpCaloInfo) {
+    m_cluster_branches.set_tree(*tree);
+    m_substructure_moment_branches.set_tree(*tree);
+  }
   m_exkt_branches.set_tree(*tree, "jet_exktsubjet_");
   m_trkjet_branches.set_tree(*tree, "jet_trkjet_");
   m_track_branches.set_tree(*tree, "jet_trk_");
@@ -1134,8 +1139,10 @@ StatusCode btagIBLAnalysisAlg::execute() {
     const xAOD::Jet *jet = selJets.at(j);
 
     // addition from Dan: fill clusters
-    m_cluster_branches.fill(jet->getConstituents());
-    m_substructure_moment_branches.fill(*jet);
+    if (m_dumpCaloInfo) {
+      m_cluster_branches.fill(jet->getConstituents());
+      m_substructure_moment_branches.fill(*jet);
+    }
 
     // additions by nikola
     const xAOD::Jet *jet_parent = 0;

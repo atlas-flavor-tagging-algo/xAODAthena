@@ -1,5 +1,5 @@
-#include "TrackBranches.hh"
-#include "TrackBranchBuffer.hh"
+#include "TrackCovBranches.hh"
+#include "TrackCovBranchBuffer.hh"
 
 #include "xAODTracking/TrackParticle.h"
 #include "TTree.h"
@@ -12,8 +12,8 @@ namespace {
     "d0","z0", "phi", "theta", "qoverp"};
 }
 
-TrackBranches::TrackBranches():
-  m_branches(new TrackBranchBuffer)
+TrackCovBranches::TrackCovBranches():
+  m_branches(new TrackCovBranchBuffer)
 {
   typedef std::vector<std::vector<float> > VVF;
   size_t n_pars = TRK_PAR.size();
@@ -24,7 +24,7 @@ TrackBranches::TrackBranches():
   }
 }
 
-TrackBranches::~TrackBranches()
+TrackCovBranches::~TrackCovBranches()
 {
   for (auto& branch: m_branches->cov) {
     delete branch.second;
@@ -32,7 +32,7 @@ TrackBranches::~TrackBranches()
   delete m_branches;
 }
 
-void TrackBranches::set_tree(TTree& output_tree,
+void TrackCovBranches::set_tree(TTree& output_tree,
                              const std::string& prefix) const {
   for (auto& pair: m_branches->cov) {
     std::string par1 = TRK_PAR.at(pair.first.first);
@@ -42,7 +42,7 @@ void TrackBranches::set_tree(TTree& output_tree,
   }
 }
 
-void TrackBranches::fill(const TrackBranches::Tracks& tracks) {
+void TrackCovBranches::fill(const TrackCovBranches::Tracks& tracks) {
   // add a vector to each branch
   for (auto& pair: m_branches->cov) {
     pair.second->push_back(std::vector<float>());
@@ -57,7 +57,7 @@ void TrackBranches::fill(const TrackBranches::Tracks& tracks) {
   }
 }
 
-void TrackBranches::clear() {
+void TrackCovBranches::clear() {
   for (auto& pair: m_branches->cov) {
     pair.second->clear();
   }
