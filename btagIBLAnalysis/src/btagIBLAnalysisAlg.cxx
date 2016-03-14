@@ -10,7 +10,6 @@
 
 #include "btagIBLAnalysisAlg.h"
 #include "GAFlavourLabel.h"
-#include "ClusterBranches.hh"
 
 #include "xAODEventInfo/EventInfo.h"
 #include "xAODTruth/TruthEventContainer.h"
@@ -2153,7 +2152,7 @@ StatusCode btagIBLAnalysisAlg::execute() {
           }
         }
       } catch(...) {
-        std::cout << "NO Muons found!" << std::endl;
+        ATH_MSG_INFO("NO Muons found!");
         // todo: write out some warning here but don't want to clog logfiles for now
       }
 
