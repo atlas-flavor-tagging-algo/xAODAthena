@@ -246,9 +246,6 @@ class btagIBLAnalysisAlg: public ::AthHistogramAlgorithm {
   std::vector<std::vector<float> > *v_jet_msv_vtx_cov3;
   std::vector<std::vector<float> > *v_jet_msv_vtx_cov4;
   std::vector<std::vector<float> > *v_jet_msv_vtx_cov5;
-  std::vector<std::vector<float> > *v_jet_msv_vtx_cov6;
-  std::vector<std::vector<float> > *v_jet_msv_vtx_cov7;
-  std::vector<std::vector<float> > *v_jet_msv_vtx_cov8;
   std::vector<std::vector<float> > *v_jet_msv_vtx_mass;
   std::vector<std::vector<float> > *v_jet_msv_vtx_efrc;
   std::vector<std::vector<float> > *v_jet_msv_vtx_ntrk;

@@ -341,9 +341,6 @@ StatusCode btagIBLAnalysisAlg::initialize() {
   v_jet_msv_vtx_cov3 = new std::vector<std::vector<float> >();
   v_jet_msv_vtx_cov4 = new std::vector<std::vector<float> >();
   v_jet_msv_vtx_cov5 = new std::vector<std::vector<float> >();
-  v_jet_msv_vtx_cov6 = new std::vector<std::vector<float> >();
-  v_jet_msv_vtx_cov7 = new std::vector<std::vector<float> >();
-  v_jet_msv_vtx_cov8 = new std::vector<std::vector<float> >();
   v_jet_msv_vtx_mass = new std::vector<std::vector<float> >();
   v_jet_msv_vtx_efrc = new std::vector<std::vector<float> >();
   v_jet_msv_vtx_ntrk = new std::vector<std::vector<float> >();
@@ -666,9 +663,6 @@ StatusCode btagIBLAnalysisAlg::initialize() {
     tree->Branch("jet_msv_vtx_cov3", &v_jet_msv_vtx_cov3);
     tree->Branch("jet_msv_vtx_cov4", &v_jet_msv_vtx_cov4);
     tree->Branch("jet_msv_vtx_cov5", &v_jet_msv_vtx_cov5);
-    tree->Branch("jet_msv_vtx_cov6", &v_jet_msv_vtx_cov6);
-    tree->Branch("jet_msv_vtx_cov7", &v_jet_msv_vtx_cov7);
-    tree->Branch("jet_msv_vtx_cov8", &v_jet_msv_vtx_cov8);
     tree->Branch("jet_msv_vtx_mass", &v_jet_msv_vtx_mass);
     tree->Branch("jet_msv_vtx_efrc", &v_jet_msv_vtx_efrc);
     tree->Branch("jet_msv_vtx_ntrk", &v_jet_msv_vtx_ntrk);
@@ -1837,9 +1831,6 @@ StatusCode btagIBLAnalysisAlg::execute() {
       std::vector<float> j_msv_cov3 = std::vector<float>(msv_nvsec, 0);
       std::vector<float> j_msv_cov4 = std::vector<float>(msv_nvsec, 0);
       std::vector<float> j_msv_cov5 = std::vector<float>(msv_nvsec, 0);
-      std::vector<float> j_msv_cov6 = std::vector<float>(msv_nvsec, 0);
-      std::vector<float> j_msv_cov7 = std::vector<float>(msv_nvsec, 0);
-      std::vector<float> j_msv_cov8 = std::vector<float>(msv_nvsec, 0);
       std::vector<float> j_msv_mass = std::vector<float>(msv_nvsec, 0);
       std::vector<float> j_msv_efrc = std::vector<float>(msv_nvsec, 0);
       std::vector<float> j_msv_ntrk = std::vector<float>(msv_nvsec, 0);
@@ -1880,9 +1871,6 @@ StatusCode btagIBLAnalysisAlg::execute() {
             j_msv_cov3[ivtx] = covariantMatrix.at(3);
             j_msv_cov4[ivtx] = covariantMatrix.at(4);
             j_msv_cov5[ivtx] = covariantMatrix.at(5);
-            j_msv_cov6[ivtx] = covariantMatrix.at(6);
-            j_msv_cov7[ivtx] = covariantMatrix.at(7);
-            j_msv_cov8[ivtx] = covariantMatrix.at(8);
             j_msv_mass[ivtx] = mass;
             j_msv_efrc[ivtx] = efrc;
             j_msv_ntrk[ivtx] = ntrk;
@@ -1907,9 +1895,6 @@ StatusCode btagIBLAnalysisAlg::execute() {
       v_jet_msv_vtx_cov3->push_back(j_msv_cov3);
       v_jet_msv_vtx_cov4->push_back(j_msv_cov4);
       v_jet_msv_vtx_cov5->push_back(j_msv_cov5);
-      v_jet_msv_vtx_cov6->push_back(j_msv_cov6);
-      v_jet_msv_vtx_cov7->push_back(j_msv_cov7);
-      v_jet_msv_vtx_cov8->push_back(j_msv_cov8);
       v_jet_msv_vtx_mass->push_back(j_msv_mass);
       v_jet_msv_vtx_efrc->push_back(j_msv_efrc);
       v_jet_msv_vtx_ntrk->push_back(j_msv_ntrk);
@@ -2924,9 +2909,6 @@ void btagIBLAnalysisAlg :: clearvectors() {
   v_jet_msv_vtx_cov3->clear();
   v_jet_msv_vtx_cov4->clear();
   v_jet_msv_vtx_cov5->clear();
-  v_jet_msv_vtx_cov6->clear();
-  v_jet_msv_vtx_cov7->clear();
-  v_jet_msv_vtx_cov8->clear();
   v_jet_msv_vtx_mass->clear();
   v_jet_msv_vtx_efrc->clear();
   v_jet_msv_vtx_ntrk->clear();
