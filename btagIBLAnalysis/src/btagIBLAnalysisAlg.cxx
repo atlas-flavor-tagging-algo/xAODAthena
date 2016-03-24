@@ -155,7 +155,7 @@ StatusCode btagIBLAnalysisAlg::initialize() {
   ATH_MSG_INFO(m_jetCollectionName);
 
   tree = new TTree( ("bTag_" + m_jetCollectionName).c_str(),
-                    ("bTag"  + m_jetCollectionName).c_str() );
+		    ("bTag"  + m_jetCollectionName).c_str() );
   ATH_MSG_INFO ("VALERIO: registering tree in stream: " << m_stream);
   CHECK( histSvc->regTree("/" + m_stream + "/tree_" + m_jetCollectionName, tree) );
 
@@ -318,6 +318,7 @@ StatusCode btagIBLAnalysisAlg::initialize() {
   v_jet_mv2c10 = new std::vector<double>();
   v_jet_mv2c20 = new std::vector<double>();
   v_jet_mv2c100 = new std::vector<double>();
+  v_jet_mv2cl100 = new std::vector<double>();
   v_jet_mv2m_pu = new std::vector<double>();
   v_jet_mv2m_pc = new std::vector<double>();
   v_jet_mv2m_pb = new std::vector<double>();
@@ -637,17 +638,18 @@ StatusCode btagIBLAnalysisAlg::initialize() {
   tree->Branch("jet_mv2c10", &v_jet_mv2c10);
   tree->Branch("jet_mv2c20", &v_jet_mv2c20);
   tree->Branch("jet_mv2c100", &v_jet_mv2c100);
+  tree->Branch("jet_mv2cl100", &v_jet_mv2cl100);
   tree->Branch("jet_mv2m_pu", &v_jet_mv2m_pu);
   tree->Branch("jet_mv2m_pc", &v_jet_mv2m_pc);
   tree->Branch("jet_mv2m_pb", &v_jet_mv2m_pb);
   tree->Branch("jet_mvb", &v_jet_mvb);
 
   /*
-    tree->Branch("jet_ip2dNT_llr", &v_jet_ip2dNT_llr);
-    tree->Branch("jet_ip3dNT_llr", &v_jet_ip3dNT_llr);
-    tree->Branch("jet_sv1Flip_llr", &v_jet_sv1flip_llr);
-    tree->Branch("jet_jfFlip_llr", &v_jet_jfflip_llr);
-    tree->Branch("jet_mv2c20Flip", &v_jet_mv2c20flip);
+  tree->Branch("jet_ip2dNT_llr", &v_jet_ip2dNT_llr);
+  tree->Branch("jet_ip3dNT_llr", &v_jet_ip3dNT_llr);
+  tree->Branch("jet_sv1Flip_llr", &v_jet_sv1flip_llr);
+  tree->Branch("jet_jfFlip_llr", &v_jet_jfflip_llr);
+  tree->Branch("jet_mv2c20Flip", &v_jet_mv2c20flip);
   */
 
   if (!m_reduceInfo && m_doMSV) {
@@ -903,11 +905,11 @@ StatusCode btagIBLAnalysisAlg::execute() {
       v_PVz->push_back(  (*vtx_itr)->z() );
       npv++;
       if ((*vtx_itr)->vertexType() == 1) {
-        if (PV_x != -999) ATH_MSG_WARNING( ".... second PV in the events ...!!!!!!");
-        m_indexPV = count;
-        PV_x = (*vtx_itr)->x(); // VALERIO !!!!!!!!
-        PV_y = (*vtx_itr)->y(); // VALERIO !!!!!!!!
-        PV_z = (*vtx_itr)->z();
+	if (PV_x != -999) ATH_MSG_WARNING( ".... second PV in the events ...!!!!!!");
+	m_indexPV = count;
+	PV_x = (*vtx_itr)->x(); // VALERIO !!!!!!!!
+ 	PV_y = (*vtx_itr)->y(); // VALERIO !!!!!!!!
+	PV_z = (*vtx_itr)->z();
       }
     }
   }
@@ -984,50 +986,50 @@ StatusCode btagIBLAnalysisAlg::execute() {
       if (newTruthVertex != 0) {
         // std::cout << " mah: " << newTruthVertex << std::endl;
         // rewrite the truth primary vertex position
-        truth_PV_x = newTruthVertex->x();
-        truth_PV_y = newTruthVertex->y();
-        truth_PV_z = newTruthVertex->z();
+	truth_PV_x = newTruthVertex->x();
+	truth_PV_y = newTruthVertex->y();
+	truth_PV_z = newTruthVertex->z();
       }
       
       // loop over truth particles in the truth event container
       for(unsigned int i = 0; i < truth->nTruthParticles(); i++) {
-        const xAOD::TruthParticle *particle = truth->truthParticle(i);
-        // VALERIO !!!!!!!!
-        if (particle->pt() > 3e3) {
-          if (fabs(particle->pdgId()) == 15) m_partonT.push_back(particle);
-          if (particle->isCharmHadron()) m_partonC.push_back(particle);
-          if (particle->isBottomHadron()) m_partonB.push_back(particle);
-        }
-        if (particle->pt() < 10e3)     continue; //was 15
-        if (particle->status() != 1)   continue;
-        if (particle->barcode() > 2e5) continue;
-  
-        if ( fabs(particle->pdgId()) != 11 && fabs(particle->pdgId()) != 13) continue;
-  
-        //std::cout << " Lepton=  pt: " << particle->pt()/1e3 << "  eta: " << particle->eta() 
-        //<< " pdg: " << particle->pdgId() << " status: " << particle->status() 
-        //<< "  barcode: " << particle->barcode() << "  --> nIncoming: " << particle->prodVtx()->nIncomingParticles() << std::endl;
+	const xAOD::TruthParticle *particle = truth->truthParticle(i);
+	// VALERIO !!!!!!!!
+	if (particle->pt() > 3e3) {
+	  if (fabs(particle->pdgId()) == 15) m_partonT.push_back(particle);
+	  if (particle->isCharmHadron()) m_partonC.push_back(particle);
+	  if (particle->isBottomHadron()) m_partonB.push_back(particle);
+	}
+	if (particle->pt() < 10e3)     continue; //was 15
+	if (particle->status() != 1)   continue;
+	if (particle->barcode() > 2e5) continue;
+	
+	if ( fabs(particle->pdgId()) != 11 && fabs(particle->pdgId()) != 13) continue;
+	
+	//std::cout << " Lepton=  pt: " << particle->pt()/1e3 << "  eta: " << particle->eta() 
+	//<< " pdg: " << particle->pdgId() << " status: " << particle->status() 
+	//<< "  barcode: " << particle->barcode() << "  --> nIncoming: " << particle->prodVtx()->nIncomingParticles() << std::endl;
 
-        // see if this electron is coming from a W boson decay
-        bool isfromW = isFromWZ( particle );
+	// see if this electron is coming from a W boson decay
+	bool isfromW = isFromWZ( particle );
 
-        /*
-          const xAOD::TruthVertex* prodvtx = particle->prodVtx();
-          for(unsigned j = 0; j < prodvtx->nIncomingParticles(); j++){
-          std::cout << "    mother=  pt: " << prodvtx->incomingParticle(j)->pt()/1e3 << "  eta: " << prodvtx->incomingParticle(j)->eta() 
-          << " pdg: " << prodvtx->incomingParticle(j)->pdgId() << " status: " << prodvtx->incomingParticle(j)->status() 
-          << "  barcode: " << prodvtx->incomingParticle(j)->barcode() << std::endl;
-          //<< "  --> nIncoming: " << prodvtx->incomingParticle(j)->prodVtx()->nIncomingParticles() << std::endl;
-          //int absPDG=fabs( (prodvtx->incomingParticle(j))->pdgId() );
-          //if( absPDG==24 || absPDG==23 ) isfromW = true;
-          */
+	/*
+	const xAOD::TruthVertex* prodvtx = particle->prodVtx();
+	for(unsigned j = 0; j < prodvtx->nIncomingParticles(); j++){
+	  std::cout << "    mother=  pt: " << prodvtx->incomingParticle(j)->pt()/1e3 << "  eta: " << prodvtx->incomingParticle(j)->eta() 
+		    << " pdg: " << prodvtx->incomingParticle(j)->pdgId() << " status: " << prodvtx->incomingParticle(j)->status() 
+		    << "  barcode: " << prodvtx->incomingParticle(j)->barcode() << std::endl;
+	  //<< "  --> nIncoming: " << prodvtx->incomingParticle(j)->prodVtx()->nIncomingParticles() << std::endl;
+	  //int absPDG=fabs( (prodvtx->incomingParticle(j))->pdgId() );
+	  //if( absPDG==24 || absPDG==23 ) isfromW = true;
+	*/
 
-        if(!isfromW) continue;
-        TLorentzVector telec;
-        telec.SetPtEtaPhiM(particle->pt(), particle->eta(), particle->phi(), particle->m());
-  
-        if (fabs(particle->pdgId()) == 11) truth_electrons.push_back(telec);
-        if (fabs(particle->pdgId()) == 13) truth_muons.push_back(telec);
+	if(!isfromW) continue;
+	TLorentzVector telec;
+	telec.SetPtEtaPhiM(particle->pt(), particle->eta(), particle->phi(), particle->m());
+	
+	if (fabs(particle->pdgId()) == 11) truth_electrons.push_back(telec);
+	if (fabs(particle->pdgId()) == 13) truth_muons.push_back(telec);
       }
     }
   }
@@ -1066,14 +1068,14 @@ StatusCode btagIBLAnalysisAlg::execute() {
 
     // jet cleaning - should be done after lepton overlap removal
     /*
-      if (m_cleanJets) {
+    if (m_cleanJets) {
       if ( (!m_jetCleaningTool->keep(*newjet)) && (newjet->pt() > 20e3) ) {
-      delete newjet;
-      badCleaning = true;
-      return StatusCode::SUCCESS;
-      break;
+        delete newjet;
+        badCleaning = true;
+        return StatusCode::SUCCESS;
+        break;
       }
-      }
+    }
     */
 
     if (newjet->pt() < m_jetPtCut) {
@@ -1111,8 +1113,8 @@ StatusCode btagIBLAnalysisAlg::execute() {
     int oIndex = -1;
     for (unsigned int j2 = 0; j2 < selJets.size(); j2++) {
       if (selJetsTMP.at(j2)->pt() == jet->pt()) {
-        oIndex = j2;
-        break;
+	oIndex = j2;
+	break;
       }
     }
     v_jet_pt_orig->push_back(tmpPt[oIndex]);
@@ -1198,9 +1200,9 @@ StatusCode btagIBLAnalysisAlg::execute() {
       float dr = deltaR(jet->eta(), tjet->eta(), jet->phi(), tjet->phi());
 
       if (dr < 0.3) {
-        dRmatch = dr;
-        matchedPt = tjet->pt();
-        break;
+	dRmatch = dr;
+	matchedPt = tjet->pt();
+	break;
       }
     }
     if (dRmatch < 0.3) {
@@ -1219,8 +1221,8 @@ StatusCode btagIBLAnalysisAlg::execute() {
       float dr = deltaR(jet->eta(), tjet->eta(), jet->phi(), tjet->phi());
 
       if (dr < 0.6) {
-        truthFree = false;
-        break;
+	truthFree = false;
+	break;
       }
     }
     v_jet_isPU->push_back(truthFree);
@@ -1339,33 +1341,33 @@ StatusCode btagIBLAnalysisAlg::execute() {
       int nGhostCHadrFromParentNotFromB = 0;
       // loop over C Hadrons
       for (unsigned int c = 0; c < ghostCFromParent.size(); c++) {
-        const xAOD::TruthParticle* cHadron = (const xAOD::TruthParticle*)(ghostCFromParent.at(c));
-        int cHadronComesFromB = 0;
+         const xAOD::TruthParticle* cHadron = (const xAOD::TruthParticle*)(ghostCFromParent.at(c));
+         int cHadronComesFromB = 0;
 
-        // loop over B Hadrons
-        for (unsigned int b = 0; b < ghostBFromParent.size(); b++) {
-          const xAOD::TruthParticle* bHadron = (const xAOD::TruthParticle*)(ghostBFromParent.at(b));
+         // loop over B Hadrons
+         for (unsigned int b = 0; b < ghostBFromParent.size(); b++) {
+           const xAOD::TruthParticle* bHadron = (const xAOD::TruthParticle*)(ghostBFromParent.at(b));
 
-          // loop over C Hadron parents
-          const xAOD::TruthParticle* cHadronParent = cHadron->parent(0);
-          while (cHadronParent != NULL) {
-            if (bHadron == cHadronParent) {
-              // ATH_MSG_INFO ("nikola: C Hadron has B Hadron parent");
-              cHadronComesFromB = 1;
-              break;
-            }
-            if (cHadronComesFromB) break;
-            else cHadronParent = cHadronParent->parent(0);
-          }
-        }
+           // loop over C Hadron parents
+           const xAOD::TruthParticle* cHadronParent = cHadron->parent(0);
+           while (cHadronParent != NULL) {
+             if (bHadron == cHadronParent) {
+               // ATH_MSG_INFO ("nikola: C Hadron has B Hadron parent");
+               cHadronComesFromB = 1;
+               break;
+             }
+             if (cHadronComesFromB) break;
+             else cHadronParent = cHadronParent->parent(0);
+           }
+         }
 
-        // use LEADING 2 ghost C Hadrons from parent jet which are NOT children of ghost B Hadrons from parent jet to later label b-tagging tracks
-        if (!cHadronComesFromB) {
-          nGhostCHadrFromParentNotFromB += 1;
-          if (matchedCNotFromB1 == NULL) matchedCNotFromB1 = cHadron;
-          else if (matchedCNotFromB2 == NULL) matchedCNotFromB2 = cHadron;
-          else ATH_MSG_INFO ("more than 2 C Hadrons which do not come from a B Hadron have been found...");
-        }
+         // use LEADING 2 ghost C Hadrons from parent jet which are NOT children of ghost B Hadrons from parent jet to later label b-tagging tracks
+         if (!cHadronComesFromB) {
+           nGhostCHadrFromParentNotFromB += 1;
+           if (matchedCNotFromB1 == NULL) matchedCNotFromB1 = cHadron;
+           else if (matchedCNotFromB2 == NULL) matchedCNotFromB2 = cHadron;
+           else ATH_MSG_INFO ("more than 2 C Hadrons which do not come from a B Hadron have been found...");
+         }
       }
       v_jet_nGhostCHadrFromParentNotFromB->push_back(nGhostCHadrFromParentNotFromB);    // the number of ghost C Hadrons from parent jet which are NOT children of ghost B Hadrons from parent jet
 
@@ -1386,8 +1388,8 @@ StatusCode btagIBLAnalysisAlg::execute() {
       std::vector<const IParticle*> ghostB; ghostB.reserve(2);
       jet->getAssociatedObjects<IParticle>(labelB, ghostB);
       if (ghostB.size() >=1 ) {
-        matchedBH = (const xAOD::TruthParticle*)(ghostB.at(0));
-        // to do: in case of 2, get the closest
+         matchedBH = (const xAOD::TruthParticle*)(ghostB.at(0));
+         // to do: in case of 2, get the closest
       }
       v_jet_nBHadr->push_back(ghostB.size());
 
@@ -1396,8 +1398,8 @@ StatusCode btagIBLAnalysisAlg::execute() {
       std::vector<const IParticle*> ghostC; ghostC.reserve(2);
       jet->getAssociatedObjects<IParticle>(labelC, ghostC);
       if (ghostC.size() >=1 ) {
-        matchedCH = (const xAOD::TruthParticle*)(ghostC.at(0));
-        // to do: in case of 2, get the closest
+         matchedCH = (const xAOD::TruthParticle*)(ghostC.at(0));
+         // to do: in case of 2, get the closest
       }
       v_jet_nCHadr->push_back(ghostC.size());
     }
@@ -1569,13 +1571,13 @@ StatusCode btagIBLAnalysisAlg::execute() {
     /*
     // this was an attempt to read from the object directly
     try {
-    v_jet_sumtrk_pt->push_back(tmpVal2);
-    //bjet->variable<float>("IP3D", "trkSum_VPt", tmpVal);
-    tmpVal = bjet->auxdata<float>("trkSum_VPt");
-    v_jet_sumtrkV_pt->push_back(tmpVal);
-    //bjet->variable<float>("IP3D", "trkSum_VEta", tmpVal);
-    tmpVal = bjet->auxdata<float>("trkSum_VEta");
-    v_jet_sumtrkV_eta->push_back(tmpVal);
+      v_jet_sumtrk_pt->push_back(tmpVal2);
+      //bjet->variable<float>("IP3D", "trkSum_VPt", tmpVal);
+      tmpVal = bjet->auxdata<float>("trkSum_VPt");
+      v_jet_sumtrkV_pt->push_back(tmpVal);
+      //bjet->variable<float>("IP3D", "trkSum_VEta", tmpVal);
+      tmpVal = bjet->auxdata<float>("trkSum_VEta");
+      v_jet_sumtrkV_eta->push_back(tmpVal);
     } catch (...) {};
     */
 
@@ -1608,14 +1610,14 @@ StatusCode btagIBLAnalysisAlg::execute() {
       associated_tracks.push_back(tmpTrk);
 
       if (m_InDetTrackSelectorTool->accept(*tmpTrk, myVertex) && m_TightTrackVertexAssociationTool->isCompatible(*tmpTrk, *myVertex) ) {
-        TLorentzVector tmpTrack(0, 0, 0, 0);
-        tmpTrack.SetPtEtaPhiM(tmpTrk->pt(), tmpTrk->eta(), tmpTrk->phi(), 0);
-        pseudoTrackJet += tmpTrack;
-        tmp_trkSum_SPt += tmpTrk->pt();
-        tmp_trkSum_nTrk++;
+	TLorentzVector tmpTrack(0, 0, 0, 0);
+	tmpTrack.SetPtEtaPhiM(tmpTrk->pt(), tmpTrk->eta(), tmpTrk->phi(), 0);
+	pseudoTrackJet += tmpTrack;
+	tmp_trkSum_SPt += tmpTrk->pt();
+	tmp_trkSum_nTrk++;
       }
       else {
-        //ATH_MSG_INFO(" .... track failed");
+	//ATH_MSG_INFO(" .... track failed");
       }
     }
     tmp_trkSum_VPt = pseudoTrackJet.Pt();
@@ -1676,7 +1678,7 @@ StatusCode btagIBLAnalysisAlg::execute() {
       bjet->taggerInfo(sv1efc, xAOD::SV1_efracsvx);
       bjet->taggerInfo(sv1ndist, xAOD::SV1_normdist);
       try {
-        bjet->variable<float>("SV1", "significance3d" , sig3d);
+	bjet->variable<float>("SV1", "significance3d" , sig3d);
       } catch(...) {}
       v_jet_sv1_pb->push_back(bjet->SV1_pb());
       v_jet_sv1_pc->push_back(bjet->SV1_pc());
@@ -1780,6 +1782,7 @@ StatusCode btagIBLAnalysisAlg::execute() {
       v_jet_mv2c10->push_back(bjet->auxdata<double>("MV2c10_discriminant"));
       v_jet_mv2c20->push_back(bjet->auxdata<double>("MV2c20_discriminant"));
       v_jet_mv2c100->push_back(bjet->auxdata<double>("MV2c100_discriminant"));
+      v_jet_mv2cl100->push_back(bjet->auxdata<double>("MV2cl100_discriminant"));
     } catch(...) { }
 
     try {
@@ -1967,8 +1970,8 @@ StatusCode btagIBLAnalysisAlg::execute() {
     
       // sort by highest signed d0 sig
       std::sort(trk_d0_z0.begin(), trk_d0_z0.end(), [](const std::pair<float, float>& a, const std::pair<float, float>& b) { 
-          return a.first > b.first; 
-        } );
+        return a.first > b.first; 
+      } );
 
       //Assign MVb variables
       if (sum_pt > 0) width = sum_pt_dr / sum_pt;
@@ -2109,7 +2112,7 @@ StatusCode btagIBLAnalysisAlg::execute() {
     if (m_SMT) {
       // additions by nikola
       try {
-        std::vector<ElementLink<xAOD::MuonContainer> > assocMuons;
+	std::vector<ElementLink<xAOD::MuonContainer> > assocMuons;
         assocMuons = bjet->auxdata<std::vector<ElementLink<xAOD::MuonContainer> > >("Muons");
         if (assocMuons.size() != 0) {
           for (unsigned int iT = 0; iT < assocMuons.size(); iT++) {
@@ -2138,123 +2141,122 @@ StatusCode btagIBLAnalysisAlg::execute() {
         }
       } catch(...) {
         ATH_MSG_INFO("NO Muons found!");
-        // todo: write out some warning here but don't want to clog logfiles for now
       }
 
       /*
-        std::cout << std::endl;
-        for( SG::auxid_t auxid : bjet->getAuxIDs() ) {
-        static SG::AuxTypeRegistry& reg = SG::AuxTypeRegistry::instance();
-        std::cout << reg.getName( auxid ) << " , " << reg.getTypeName( auxid ) << std::endl;
-        }
+      std::cout << std::endl;
+      for( SG::auxid_t auxid : bjet->getAuxIDs() ) {
+	static SG::AuxTypeRegistry& reg = SG::AuxTypeRegistry::instance();
+	std::cout << reg.getName( auxid ) << " , " << reg.getTypeName( auxid ) << std::endl;
+      }
       */
 
       // new from Valerio: if the variables are already available, do not calculate them
       if ( bjet->isAvailable<float>("SMT_mu_pt") ) {
-        //std::cout << "SMT info already available, will get them from there ... " << std::endl;
-        jet_mu_dRmin_dR             = bjet->auxdata<float>("SMT_dR");
-        jet_mu_dRmin_pt             = bjet->auxdata<float>("SMT_mu_pt");
-        jet_mu_dRmin_qOverPratio    = bjet->auxdata<float>("SMT_qOverPratio");
-        jet_mu_dRmin_mombalsignif   = bjet->auxdata<float>("SMT_mombalsignif");
-        jet_mu_dRmin_scatneighsignif= bjet->auxdata<float>("SMT_scatneighsignif");
-        jet_mu_dRmin_pTrel          = bjet->auxdata<float>("SMT_pTrel");
-        jet_mu_dRmin_d0             = bjet->auxdata<float>("SMT_mu_d0");
-        jet_mu_dRmin_z0             = bjet->auxdata<float>("SMT_mu_z0");
-        jet_mu_dRmin_ID_qOverP_var  = bjet->auxdata<float>("SMT_ID_qOverP");
-        jet_mu_dRmin_assJet_pt=jet->pt()/1000; // ?? why is this variable needed?
-        jet_mu_dRmin_truthflav=thisJetTruthLabel;
+	//std::cout << "SMT info already available, will get them from there ... " << std::endl;
+	jet_mu_dRmin_dR             = bjet->auxdata<float>("SMT_dR");
+	jet_mu_dRmin_pt             = bjet->auxdata<float>("SMT_mu_pt");
+	jet_mu_dRmin_qOverPratio    = bjet->auxdata<float>("SMT_qOverPratio");
+	jet_mu_dRmin_mombalsignif   = bjet->auxdata<float>("SMT_mombalsignif");
+	jet_mu_dRmin_scatneighsignif= bjet->auxdata<float>("SMT_scatneighsignif");
+	jet_mu_dRmin_pTrel          = bjet->auxdata<float>("SMT_pTrel");
+	jet_mu_dRmin_d0             = bjet->auxdata<float>("SMT_mu_d0");
+	jet_mu_dRmin_z0             = bjet->auxdata<float>("SMT_mu_z0");
+	jet_mu_dRmin_ID_qOverP_var  = bjet->auxdata<float>("SMT_ID_qOverP");
+	jet_mu_dRmin_assJet_pt=jet->pt()/1000; // ?? why is this variable needed?
+	jet_mu_dRmin_truthflav=thisJetTruthLabel;
 
-        ElementLink<xAOD::MuonContainer> tmpMuonLink= bjet->auxdata<ElementLink<xAOD::MuonContainer> >("SMT_mu_link");
-        if ( tmpMuonLink.isValid() ) {
-          const xAOD::Muon* tmpMuon=(*tmpMuonLink);
-          //std::cout << " link is: " << tmpMuon << std::endl;
-          if ( tmpMuon!=0 ) {
-            jet_mu_dRmin_eta      =tmpMuon->eta();
-            jet_mu_dRmin_phi      =tmpMuon->phi();
-            jet_mu_dRmin_muonType =tmpMuon->muonType();
-            //std::cout << " .... after eta and friends" << std::endl;
-            const ElementLink< xAOD::TrackParticleContainer >& pMuIDTrack=tmpMuon->inDetTrackParticleLink();
-            //std::cout << "   the link is: " << pMuIDTrack << std::endl;
-            const xAOD::Vertex * pVtx=(*pMuIDTrack)->vertex();
-            if(pVtx!=NULL) {
-              jet_mu_dRmin_VtxTyp=pVtx->vertexType();
-            } else {jet_mu_dRmin_VtxTyp=999.;}
-            const xAOD::TruthParticle* matched_truth_muon=0;
-            if(tmpMuon->isAvailable<ElementLink<xAOD::TruthParticleContainer> >("truthParticleLink")) {
-              ElementLink<xAOD::TruthParticleContainer> link = tmpMuon->auxdata<ElementLink<xAOD::TruthParticleContainer> >("truthParticleLink");
-              if(link.isValid()) {
-                matched_truth_muon = *link;
-                int pdgid = parent_classify(matched_truth_muon);
-                jet_mu_dRmin_parent_pdgid=pdgid;
-              } else {jet_mu_dRmin_parent_pdgid=999.;}
-            }
-          }
-        }
+	ElementLink<xAOD::MuonContainer> tmpMuonLink= bjet->auxdata<ElementLink<xAOD::MuonContainer> >("SMT_mu_link");
+	if ( tmpMuonLink.isValid() ) {
+	  const xAOD::Muon* tmpMuon=(*tmpMuonLink);
+	  //std::cout << " link is: " << tmpMuon << std::endl;
+	  if ( tmpMuon!=0 ) {
+	    jet_mu_dRmin_eta      =tmpMuon->eta();
+	    jet_mu_dRmin_phi      =tmpMuon->phi();
+	    jet_mu_dRmin_muonType =tmpMuon->muonType();
+	    //std::cout << " .... after eta and friends" << std::endl;
+	    const ElementLink< xAOD::TrackParticleContainer >& pMuIDTrack=tmpMuon->inDetTrackParticleLink();
+	    //std::cout << "   the link is: " << pMuIDTrack << std::endl;
+	    const xAOD::Vertex * pVtx=(*pMuIDTrack)->vertex();
+	    if(pVtx!=NULL) {
+	      jet_mu_dRmin_VtxTyp=pVtx->vertexType();
+	    } else {jet_mu_dRmin_VtxTyp=999.;}
+	    const xAOD::TruthParticle* matched_truth_muon=0;
+	    if(tmpMuon->isAvailable<ElementLink<xAOD::TruthParticleContainer> >("truthParticleLink")) {
+	      ElementLink<xAOD::TruthParticleContainer> link = tmpMuon->auxdata<ElementLink<xAOD::TruthParticleContainer> >("truthParticleLink");
+	      if(link.isValid()) {
+		matched_truth_muon = *link;
+		int pdgid = parent_classify(matched_truth_muon);
+		jet_mu_dRmin_parent_pdgid=pdgid;
+	      } else {jet_mu_dRmin_parent_pdgid=999.;}
+	    }
+	  }
+	}
 
       } else {
-        try{
-          std::vector<ElementLink<xAOD::MuonContainer> > assocMuons;
-          assocMuons= bjet->auxdata<std::vector<ElementLink<xAOD::MuonContainer> > >("Muons");
-          if(assocMuons.size()!=0){
-            for (unsigned int iT=0; iT<assocMuons.size(); iT++) {
-              if (!assocMuons.at(iT).isValid()) continue;
-              const xAOD::Muon* tmpMuon= *(assocMuons.at(iT));
-              float dr = deltaR(tmpMuon->eta(),jet->eta(),tmpMuon->phi(),jet->phi());
-              if(dr>=0.4) continue;
-              const ElementLink< xAOD::TrackParticleContainer >& pMuIDTrack=tmpMuon->inDetTrackParticleLink();
-              const ElementLink< xAOD::TrackParticleContainer >& pMuMSTrack=tmpMuon->muonSpectrometerTrackParticleLink();
-              const xAOD::Vertex * pVtx=(*pMuIDTrack)->vertex();
-              const std::vector<float>&cov= (*pMuIDTrack)->definingParametersCovMatrixVec();
-              float momBalSignif0=999.;
-              tmpMuon->parameter(momBalSignif0, xAOD::Muon::momentumBalanceSignificance);
-              if(momBalSignif0==0) continue;
-              if((*pMuMSTrack)->qOverP()==0) continue;
-              if(dr<jet_mu_dRmin_dR){
-                jet_mu_dRmin_dR=dr;
-                jet_mu_dRmin_pt=tmpMuon->pt()/1000;
-                jet_mu_dRmin_truthflav=thisJetTruthLabel;
-                jet_mu_dRmin_eta=tmpMuon->eta();
-                jet_mu_dRmin_phi=tmpMuon->phi();
-                jet_mu_dRmin_assJet_pt=jet->pt()/1000;
-                jet_mu_dRmin_qOverPratio=(*pMuIDTrack)->qOverP()/(*pMuMSTrack)->qOverP();
-                float momBalSignif=999.;
-                if(tmpMuon->parameter(momBalSignif, xAOD::Muon::momentumBalanceSignificance)) {
-                  jet_mu_dRmin_mombalsignif=momBalSignif;
-                } else {jet_mu_dRmin_mombalsignif=momBalSignif;}
-                float scatNeighSignif=999.;
-                if(tmpMuon->parameter(scatNeighSignif, xAOD::Muon::scatteringNeighbourSignificance)) {
-                  jet_mu_dRmin_scatneighsignif=scatNeighSignif;
-                } else {jet_mu_dRmin_scatneighsignif=scatNeighSignif;}
-                TLorentzVector myjet, mymu;
-                myjet.SetPtEtaPhiM(jet->pt(),jet->eta(),jet->phi(),0);
-                mymu.SetPtEtaPhiM(tmpMuon->pt(),tmpMuon->eta(),tmpMuon->phi(),0);
-                jet_mu_dRmin_pTrel=myjet.Vect().Perp(mymu.Vect())/1000;
-                if(pVtx!=NULL) {
-                  jet_mu_dRmin_VtxTyp=pVtx->vertexType();
-                } else {jet_mu_dRmin_VtxTyp=999.;}
-                jet_mu_dRmin_d0=tmpMuon->primaryTrackParticle()->d0();
-                jet_mu_dRmin_z0=tmpMuon->primaryTrackParticle()->z0();
+	try{
+	  std::vector<ElementLink<xAOD::MuonContainer> > assocMuons;
+	  assocMuons= bjet->auxdata<std::vector<ElementLink<xAOD::MuonContainer> > >("Muons");
+	  if(assocMuons.size()!=0){
+	    for (unsigned int iT=0; iT<assocMuons.size(); iT++) {
+	      if (!assocMuons.at(iT).isValid()) continue;
+	      const xAOD::Muon* tmpMuon= *(assocMuons.at(iT));
+	      float dr = deltaR(tmpMuon->eta(),jet->eta(),tmpMuon->phi(),jet->phi());
+	      if(dr>=0.4) continue;
+	      const ElementLink< xAOD::TrackParticleContainer >& pMuIDTrack=tmpMuon->inDetTrackParticleLink();
+	      const ElementLink< xAOD::TrackParticleContainer >& pMuMSTrack=tmpMuon->muonSpectrometerTrackParticleLink();
+	      const xAOD::Vertex * pVtx=(*pMuIDTrack)->vertex();
+	      const std::vector<float>&cov= (*pMuIDTrack)->definingParametersCovMatrixVec();
+	      float momBalSignif0=999.;
+	      tmpMuon->parameter(momBalSignif0, xAOD::Muon::momentumBalanceSignificance);
+	      if(momBalSignif0==0) continue;
+	      if((*pMuMSTrack)->qOverP()==0) continue;
+	      if(dr<jet_mu_dRmin_dR){
+		jet_mu_dRmin_dR=dr;
+		jet_mu_dRmin_pt=tmpMuon->pt()/1000;
+		jet_mu_dRmin_truthflav=thisJetTruthLabel;
+		jet_mu_dRmin_eta=tmpMuon->eta();
+		jet_mu_dRmin_phi=tmpMuon->phi();
+		jet_mu_dRmin_assJet_pt=jet->pt()/1000;
+		jet_mu_dRmin_qOverPratio=(*pMuIDTrack)->qOverP()/(*pMuMSTrack)->qOverP();
+		float momBalSignif=999.;
+		if(tmpMuon->parameter(momBalSignif, xAOD::Muon::momentumBalanceSignificance)) {
+		  jet_mu_dRmin_mombalsignif=momBalSignif;
+		} else {jet_mu_dRmin_mombalsignif=momBalSignif;}
+		float scatNeighSignif=999.;
+		if(tmpMuon->parameter(scatNeighSignif, xAOD::Muon::scatteringNeighbourSignificance)) {
+		  jet_mu_dRmin_scatneighsignif=scatNeighSignif;
+		} else {jet_mu_dRmin_scatneighsignif=scatNeighSignif;}
+		TLorentzVector myjet, mymu;
+		myjet.SetPtEtaPhiM(jet->pt(),jet->eta(),jet->phi(),0);
+		mymu.SetPtEtaPhiM(tmpMuon->pt(),tmpMuon->eta(),tmpMuon->phi(),0);
+		jet_mu_dRmin_pTrel=myjet.Vect().Perp(mymu.Vect())/1000;
+		if(pVtx!=NULL) {
+		  jet_mu_dRmin_VtxTyp=pVtx->vertexType();
+		} else {jet_mu_dRmin_VtxTyp=999.;}
+		jet_mu_dRmin_d0=tmpMuon->primaryTrackParticle()->d0();
+		jet_mu_dRmin_z0=tmpMuon->primaryTrackParticle()->z0();
 
-                const xAOD::TruthParticle* matched_truth_muon=0;
-                if(tmpMuon->isAvailable<ElementLink<xAOD::TruthParticleContainer> >("truthParticleLink")) {
-                  ElementLink<xAOD::TruthParticleContainer> link = tmpMuon->auxdata<ElementLink<xAOD::TruthParticleContainer> >("truthParticleLink");
-                  if(link.isValid()) {
-                    matched_truth_muon = *link;
-                    int pdgid = parent_classify(matched_truth_muon);
-                    jet_mu_dRmin_parent_pdgid=pdgid;
-                  } else {jet_mu_dRmin_parent_pdgid=999.;}
-                }
-                jet_mu_dRmin_ID_qOverP_var=cov[14];
-                jet_mu_dRmin_muonType=tmpMuon->muonType();
-              }
-            }
-          }
-        } catch(...) {
-          //std::cout << "NO Muons found!"<<std::endl;
-          //todo: write out some warning here but don't want to clog logfiles for now
-        }
+		const xAOD::TruthParticle* matched_truth_muon=0;
+		if(tmpMuon->isAvailable<ElementLink<xAOD::TruthParticleContainer> >("truthParticleLink")) {
+		  ElementLink<xAOD::TruthParticleContainer> link = tmpMuon->auxdata<ElementLink<xAOD::TruthParticleContainer> >("truthParticleLink");
+		  if(link.isValid()) {
+		    matched_truth_muon = *link;
+		    int pdgid = parent_classify(matched_truth_muon);
+		    jet_mu_dRmin_parent_pdgid=pdgid;
+		  } else {jet_mu_dRmin_parent_pdgid=999.;}
+		}
+		jet_mu_dRmin_ID_qOverP_var=cov[14];
+		jet_mu_dRmin_muonType=tmpMuon->muonType();
+	      }
+	    }
+	  }
+	} catch(...) {
+	  //std::cout << "NO Muons found!"<<std::endl;
+	  //todo: write out some warning here but don't want to clog logfiles for now
+	}
       }
-    }
+     }
 
     for (unsigned int sv0V = 0; sv0V < SV0vertices.size(); sv0V++) {
       if (!SV0vertices.at(sv0V).isValid()) {
@@ -2451,21 +2453,21 @@ StatusCode btagIBLAnalysisAlg::execute() {
           trackAlgo += 1 << IP3D;
           index = iT;
           break;
-        }
+	}
       }
 
       if (index!=-1) {
-        j_trk_ip3d_grade.push_back(tmpGrading.at(index));
-        ip3d_llr=-999;
-        ip2d_llr=-999;
-        if (tmpIP3DUwgt.at(index)!=0) ip3d_llr = log(tmpIP3DBwgt.at(index)/tmpIP3DUwgt.at(index));
-        if (tmpIP2DUwgt.at(index)!=0) ip2d_llr = log(tmpIP2DBwgt.at(index)/tmpIP2DUwgt.at(index));
-        j_trk_ip3d_llr.push_back(ip3d_llr);
-        j_trk_ip2d_llr.push_back(ip2d_llr);
+	j_trk_ip3d_grade.push_back(tmpGrading.at(index));
+	ip3d_llr=-999;
+	ip2d_llr=-999;
+	if (tmpIP3DUwgt.at(index)!=0) ip3d_llr = log(tmpIP3DBwgt.at(index)/tmpIP3DUwgt.at(index));
+	if (tmpIP2DUwgt.at(index)!=0) ip2d_llr = log(tmpIP2DBwgt.at(index)/tmpIP2DUwgt.at(index));
+	j_trk_ip3d_llr.push_back(ip3d_llr);
+	j_trk_ip2d_llr.push_back(ip2d_llr);
       } else {
-        j_trk_ip3d_grade.push_back(-10);
-        j_trk_ip3d_llr.push_back(-999);
-        j_trk_ip2d_llr.push_back(-999);
+	j_trk_ip3d_grade.push_back(-10);
+	j_trk_ip3d_llr.push_back(-999);
+	j_trk_ip2d_llr.push_back(-999);
       }
       if (particleInCollection(tmpTrk, IP2DTracks)) trackAlgo += 1 << IP2D;
       if (particleInCollection(tmpTrk, SV0Tracks)) trackAlgo +=1 << SV0;
@@ -2501,11 +2503,11 @@ StatusCode btagIBLAnalysisAlg::execute() {
         if (truth->prodVtx()) {
           j_trk_vtx_X.push_back(truth->prodVtx()->x());
           j_trk_vtx_Y.push_back(truth->prodVtx()->y());
-        }
+	}
         else {
           j_trk_vtx_X.push_back(-666);
           j_trk_vtx_Y.push_back(-666);
-        }
+	}
       }
       else{
         j_trk_vtx_X.push_back(-999);
@@ -2886,6 +2888,7 @@ void btagIBLAnalysisAlg :: clearvectors() {
   v_jet_mv2c10->clear();
   v_jet_mv2c20->clear();
   v_jet_mv2c100->clear();
+  v_jet_mv2cl100->clear();
   v_jet_mv2m_pu->clear();
   v_jet_mv2m_pb->clear();
   v_jet_mv2m_pc->clear();
@@ -3081,69 +3084,69 @@ int btagIBLAnalysisAlg :: getTrackOrigin(const xAOD::TrackParticle *tmpTrk,
                                          std::vector<const xAOD::TruthParticle*> tracksFromC2,
                                          std::vector<const xAOD::TruthParticle*> tracksFromCNotFromB1,
                                          std::vector<const xAOD::TruthParticle*> tracksFromCNotFromB2) {
-  // origin
-  int origin = PUFAKE;
-  const xAOD::TruthParticle *truth = truthParticle(tmpTrk);
-  float truthProb = -1; // need to check MCtruth classifier
-  try {
-    truthProb = tmpTrk->auxdata< float >("truthMatchProbability");
-  } catch(...) {};
-  if (truth && truthProb > 0.75) {
-    int truthBarcode = truth->barcode();
-    if (truthBarcode > 2e5) origin = GEANT;
-    else {
-      origin = FRAG;
-      for (unsigned int iT = 0; iT < tracksFromB.size(); iT++) {
-        if (truth == tracksFromB.at(iT)) {
-          origin = FROMB;
-          break;
+      // origin
+      int origin = PUFAKE;
+      const xAOD::TruthParticle *truth = truthParticle(tmpTrk);
+      float truthProb = -1; // need to check MCtruth classifier
+      try {
+         truthProb = tmpTrk->auxdata< float >("truthMatchProbability");
+      } catch(...) {};
+      if (truth && truthProb > 0.75) {
+        int truthBarcode = truth->barcode();
+        if (truthBarcode > 2e5) origin = GEANT;
+        else {
+          origin = FRAG;
+          for (unsigned int iT = 0; iT < tracksFromB.size(); iT++) {
+            if (truth == tracksFromB.at(iT)) {
+              origin = FROMB;
+              break;
+            }
+          }
+          for (unsigned int iT = 0; iT < tracksFromC.size(); iT++) {
+            if (truth == tracksFromC.at(iT)) {
+              origin = FROMC;
+              break;
+            }
+          }
+          // additions by nikola
+          for (unsigned int iT = 0; iT < tracksFromB1.size(); iT++) {
+            if (truth == tracksFromB1.at(iT)) {
+              origin = 10;
+              break;
+            }
+          }
+          for (unsigned int iT = 0; iT < tracksFromB2.size(); iT++) {
+            if (truth == tracksFromB2.at(iT)) {
+              origin = 11;
+              break;
+            }
+          }
+          for (unsigned int iT = 0; iT < tracksFromC1.size(); iT++) {
+            if (truth == tracksFromC1.at(iT)) {
+              origin = 12;
+              break;
+            }
+          }
+          for (unsigned int iT = 0; iT < tracksFromC2.size(); iT++) {
+            if (truth == tracksFromC2.at(iT)) {
+              origin = 13;
+              break;
+            }
+          }
+          for (unsigned int iT = 0; iT < tracksFromCNotFromB1.size(); iT++) {
+            if (truth == tracksFromCNotFromB1.at(iT)) {
+              origin = 14;
+              break;
+            }
+          }
+          for (unsigned int iT = 0; iT < tracksFromCNotFromB2.size(); iT++) {
+            if (truth == tracksFromCNotFromB2.at(iT)) {
+              origin = 15;
+              break;
+            }
+          }
         }
       }
-      for (unsigned int iT = 0; iT < tracksFromC.size(); iT++) {
-        if (truth == tracksFromC.at(iT)) {
-          origin = FROMC;
-          break;
-        }
-      }
-      // additions by nikola
-      for (unsigned int iT = 0; iT < tracksFromB1.size(); iT++) {
-        if (truth == tracksFromB1.at(iT)) {
-          origin = 10;
-          break;
-        }
-      }
-      for (unsigned int iT = 0; iT < tracksFromB2.size(); iT++) {
-        if (truth == tracksFromB2.at(iT)) {
-          origin = 11;
-          break;
-        }
-      }
-      for (unsigned int iT = 0; iT < tracksFromC1.size(); iT++) {
-        if (truth == tracksFromC1.at(iT)) {
-          origin = 12;
-          break;
-        }
-      }
-      for (unsigned int iT = 0; iT < tracksFromC2.size(); iT++) {
-        if (truth == tracksFromC2.at(iT)) {
-          origin = 13;
-          break;
-        }
-      }
-      for (unsigned int iT = 0; iT < tracksFromCNotFromB1.size(); iT++) {
-        if (truth == tracksFromCNotFromB1.at(iT)) {
-          origin = 14;
-          break;
-        }
-      }
-      for (unsigned int iT = 0; iT < tracksFromCNotFromB2.size(); iT++) {
-        if (truth == tracksFromCNotFromB2.at(iT)) {
-          origin = 15;
-          break;
-        }
-      }
-    }
-  }
   return origin;
 }
 
