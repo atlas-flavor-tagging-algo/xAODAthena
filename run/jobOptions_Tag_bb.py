@@ -13,7 +13,7 @@ JetCollections = [
   #'AntiKt4EMTopoJets', 
   #'AntiKt3PV0TrackJets',
   #'AntiKt2PV0TrackJets',
-  #'AntiKt4LCTopoJets', 
+  #'AntiKt4LCTopoJets',
   'AntiKt10LCTopoTrimmedPtFrac5SmallR20Jets'
   ]
 
@@ -101,8 +101,8 @@ print "geoFlags.isIBL() = "+str(  geoFlags.isIBL() )
 ### Qi: Jet Business
 
 # Actually build AntiKt10LCTopoTrimmedPtFrac5SmallR20Jets here
-# from DerivationFrameworkJetEtMiss.ExtendedJetCommon import *
-# addDefaultTrimmedJets(algSeq, "WhoCares")
+#from DerivationFrameworkJetEtMiss.ExtendedJetCommon import addDefaultTrimmedJets
+#addDefaultTrimmedJets(algSeq, "WhoCares")
 
 # make exkt subjet finding tool
 def buildExclusiveSubjets(JetCollectionName, nsubjet, ToolSvc = ToolSvc):
