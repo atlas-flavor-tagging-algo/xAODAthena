@@ -25,7 +25,8 @@ import glob
 from AthenaCommon.AthenaCommonFlags import jobproperties as jp
 jp.AthenaCommonFlags.EvtMax.set_Value_and_Lock(10)
 
-jp.AthenaCommonFlags.FilesInput = [ "/afs/cern.ch/work/n/nwhallon/public/xAOD_samples/mc15_13TeV.301523.MadGraphPythia8EvtGen_A14NNPDF23LO_RS_G_hh_bbbb_c20_M2000.merge.AOD.e3820_s2608_s2183_r6630_r6264_tid05471453_00/AOD.05471453._000002.pool.root.1" ]
+# jp.AthenaCommonFlags.FilesInput = [ "/afs/cern.ch/work/n/nwhallon/public/xAOD_samples/mc15_13TeV.301523.MadGraphPythia8EvtGen_A14NNPDF23LO_RS_G_hh_bbbb_c20_M2000.merge.AOD.e3820_s2608_s2183_r6630_r6264_tid05471453_00/AOD.05471453._000002.pool.root.1" ]
+jp.AthenaCommonFlags.FilesInput = [ "/afs/cern.ch/work/n/nwhallon/public/VRDerivation/group.phys-exotics.301523.RS_G_hh_bbbb_c20_M2000.e3820_s2608_s2183_r6630_r6264.test10_DAOD_VRJM.VRJM.pool.root/group.phys-exotics.8015612._000001.DAOD_VRJM.VRJM.pool.root.2"]
 
 svcMgr += CfgMgr.THistSvc()
 for jet in JetCollections:
@@ -100,8 +101,8 @@ print "geoFlags.isIBL() = "+str(  geoFlags.isIBL() )
 ### Qi: Jet Business
 
 # Actually build AntiKt10LCTopoTrimmedPtFrac5SmallR20Jets here
-from DerivationFrameworkJetEtMiss.ExtendedJetCommon import *
-addDefaultTrimmedJets(algSeq, "WhoCares")
+# from DerivationFrameworkJetEtMiss.ExtendedJetCommon import *
+# addDefaultTrimmedJets(algSeq, "WhoCares")
 
 # make exkt subjet finding tool
 def buildExclusiveSubjets(JetCollectionName, nsubjet, ToolSvc = ToolSvc):
