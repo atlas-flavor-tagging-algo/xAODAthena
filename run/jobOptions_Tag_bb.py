@@ -236,6 +236,8 @@ if doRetag:
 
   # Stuff from Dan: dump more information on vertices
   # replace JetFitter
+  # TODO: figure out if this is running,
+  #       and how to get the resulting vertices
   from BTagging.BTaggingConfiguration import cloneToolCollection, getToolCollections
   jfname = ("JetFitterCollection", "DG")
   cloneToolCollection(*jfname)
