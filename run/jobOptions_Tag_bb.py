@@ -196,7 +196,7 @@ for JetCollectionExKtSubJet in JetCollectionExKtSubJetList:
   BTaggingFlags.CalibrationChannelAliases += [JetCollectionExKtSubJet[:-4]+"->AntiKt4LCTopo"]
 
 # For debugging 
-# BTaggingFlags.OutputLevel = 1
+BTaggingFlags.OutputLevel = 1
 
 # For user-defined calibration file
 #BTaggingFlags.CalibrationFromLocalReplica = True 
@@ -241,10 +241,16 @@ if doRetag:
   from BTagging.BTaggingConfiguration import cloneToolCollection, getToolCollections
   jfname = ("JetFitterCollection", "DG")
   cloneToolCollection(*jfname)
-  for jc in JetCollections:
+  for jc_long in JetCollections:
+    jc = jc_long[:-4]
     btag_conf.addTool('JetFitterTagNNDG', ToolSvc, "BTagTrackToJetAssociator",jc)
     jfvx = btag_conf.getTool("NewJetFitterVxFinderDG", "BTagTrackToJetAssociator",jc)
     jfvx.VertexClusteringProbabilityCut = 1.0
+    apple = btag_conf.getJetCollectionSecVertexingTool(jc)
+    print "DANTAGGING!", jc
+    print "DANTAGGING!", apple.SecVtxFinderxAODBaseNameList
+    print "DANTAGGING!", apple.SecVtxFinderList
+    print jfvx
 
 
 ##########################################################################################################################################################
