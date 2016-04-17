@@ -4,6 +4,8 @@
 // Author(s): marx@cern.ch
 // Description: athena-based code to process xAODs
 ///////////////////////////////////////
+#include "track_to_vertex_associators.hh"
+
 #include <utility>
 #include "GaudiKernel/ITHistSvc.h"
 #include "GaudiKernel/ServiceHandle.h"
@@ -93,7 +95,7 @@ btagIBLAnalysisAlg::btagIBLAnalysisAlg( const std::string& name, ISvcLocator *pS
   m_cluster_branches(),
   m_substructure_moment_branches(),
   m_exkt_branches(),
-  m_trkjet_branches(),
+  m_vrtrkjet_branches(),
   m_track_branches(),
   m_unclustered_vertices(),
   m_jetCleaningTool("JetCleaningTool/JetCleaningTool", this),
@@ -199,7 +201,7 @@ StatusCode btagIBLAnalysisAlg::initialize() {
     m_substructure_moment_branches.set_tree(*tree);
   }
   m_exkt_branches.set_tree(*tree, "jet_exktsubjet_");
-  m_trkjet_branches.set_tree(*tree, "jet_trkjet_");
+  m_vrtrkjet_branches.set_tree(*tree, "jet_vrtrkjet_");
   m_unclustered_vertices.set_tree(*tree, "jet_trkjet_");
   m_track_branches.set_tree(*tree, "jet_trk_");
 
@@ -466,13 +468,6 @@ StatusCode btagIBLAnalysisAlg::initialize() {
   v_jet_trk3_z0sig  = new std::vector<float>();
   v_jet_sv_scaled_efc  = new std::vector<float>();
   v_jet_jf_scaled_efc  = new std::vector<float>();
-
-  v_jet_vrtrkjet_pt = new std::vector<std::vector<float> >();
-  v_jet_vrtrkjet_eta = new std::vector<std::vector<float> >();
-  v_jet_vrtrkjet_phi = new std::vector<std::vector<float> >();
-  v_jet_vrtrkjet_m = new std::vector<std::vector<float> >();
-  v_jet_vrtrkjet_ntrk = new std::vector<std::vector<int> >();
-  v_jet_vrtrkjet_mv2c20 = new std::vector<std::vector<double> >();
 
   // additions by andrea
   v_jet_mu_assJet_pt = new std::vector<float>();
@@ -795,13 +790,6 @@ StatusCode btagIBLAnalysisAlg::initialize() {
   if (!m_essentialInfo) tree->Branch("jet_trk3_z0sig", &v_jet_trk3_z0sig);
   if (!m_essentialInfo) tree->Branch("jet_sv_scaled_efc", &v_jet_sv_scaled_efc);
   if (!m_essentialInfo) tree->Branch("jet_jf_scaled_efc", &v_jet_jf_scaled_efc);
-
-  if (!m_essentialInfo) tree->Branch("jet_vrtrkjet_pt", &v_jet_vrtrkjet_pt);
-  if (!m_essentialInfo) tree->Branch("jet_vrtrkjet_eta", &v_jet_vrtrkjet_eta);
-  if (!m_essentialInfo) tree->Branch("jet_vrtrkjet_phi", &v_jet_vrtrkjet_phi);
-  if (!m_essentialInfo) tree->Branch("jet_vrtrkjet_m", &v_jet_vrtrkjet_m);
-  if (!m_essentialInfo) tree->Branch("jet_vrtrkjet_ntrk", &v_jet_vrtrkjet_ntrk);
-  if (!m_essentialInfo) tree->Branch("jet_vrtrkjet_mv2c20", &v_jet_vrtrkjet_mv2c20);
 
   // additions by andrea
   if (m_SMT) {
@@ -2040,41 +2028,13 @@ StatusCode btagIBLAnalysisAlg::execute() {
 //      jet_parent->getAssociatedObjects<xAOD::Jet>("GhostAntiKt2TrackJet", ghostTrackJet2);
       jet->getAssociatedObjects<xAOD::Jet>("GhostAntiKt2TrackJet", ghostTrackJet2);
       if (ghostTrackJet2.size() >= 2) {
-        m_trkjet_branches.fill(ghostTrackJet2);
         m_unclustered_vertices.fill(ghostTrackJet2);
       }
 
-      std::vector<float> vrtrkjet_pt;
-      std::vector<float> vrtrkjet_eta;
-      std::vector<float> vrtrkjet_phi;
-      std::vector<float> vrtrkjet_m;
-      std::vector<int> vrtrkjet_ntrk;
-      std::vector<double> vrtrkjet_mv2c20;
-
       std::vector<const xAOD::Jet*> ghostVRTrackJet;
-
-//      jet_parent->getAssociatedObjects<xAOD::Jet>("GhostVR50Rmax4Rmin0TrackJet", ghostVRTrackJet);
       jet->getAssociatedObjects<xAOD::Jet>("GhostVR50Rmax4Rmin0TrackJet", ghostVRTrackJet);
 
-      for (unsigned int i = 0; i < ghostVRTrackJet.size(); i++) {
-        // apply track jet selection
-        if (ghostVRTrackJet.at(i)->numConstituents() >= 2 && ghostVRTrackJet.at(i)->pt() > 10000 && fabs(ghostVRTrackJet.at(i)->eta()) < 2.5) {
-          vrtrkjet_pt.push_back(ghostVRTrackJet.at(i)->pt());
-          vrtrkjet_eta.push_back(ghostVRTrackJet.at(i)->eta());
-          vrtrkjet_phi.push_back(ghostVRTrackJet.at(i)->phi());
-          vrtrkjet_m.push_back(ghostVRTrackJet.at(i)->m());
-          vrtrkjet_ntrk.push_back(ghostVRTrackJet.at(i)->numConstituents());
-
-          const xAOD::BTagging *ghostTrackBJet = ghostVRTrackJet.at(i)->btagging();
-          vrtrkjet_mv2c20.push_back(ghostTrackBJet->auxdata<double>("MV2c20_discriminant"));
-        }
-      }
-      v_jet_vrtrkjet_pt->push_back(vrtrkjet_pt);
-      v_jet_vrtrkjet_eta->push_back(vrtrkjet_eta);
-      v_jet_vrtrkjet_phi->push_back(vrtrkjet_phi);
-      v_jet_vrtrkjet_m->push_back(vrtrkjet_m);
-      v_jet_vrtrkjet_ntrk->push_back(vrtrkjet_ntrk);
-      v_jet_vrtrkjet_mv2c20->push_back(vrtrkjet_mv2c20);
+      m_vrtrkjet_branches.fill(ghostVRTrackJet);
     }
 
     // now the tracking part: prepare all the tmpVectors
@@ -2442,6 +2402,8 @@ StatusCode btagIBLAnalysisAlg::execute() {
     ////////////////////////////////////////////////////////////////////////////////
     // Addition from Dan: first fill my track branches
     m_track_branches.fill(associated_tracks);
+    // build track to vertex maps (from track_to_vertex_associators)
+    auto msv_vtx_map = trkvx::get_msv_map(*bjet);
     // MAIN TRACK LOOP
     for (unsigned int iT = 0; iT < assocTracks.size(); iT++) {
       // std::cout << " .... trk link: " << iT << std::endl;
@@ -2470,27 +2432,8 @@ StatusCode btagIBLAnalysisAlg::execute() {
 
       // if doing MSV, keep track of which MSV this track belongs to
       if (m_doMSV) {
-        int trk_assoc_msv = -1;
-
-        // get msv vertices
-        std::vector< ElementLink< xAOD::VertexContainer > > msvVertices;
-        bjet->variable<std::vector<ElementLink<xAOD::VertexContainer> > >("MSV", "vertices", msvVertices);
-
-        // loop over vertices
-        if (msvVertices.size() > 0) {
-          for (size_t vtx = 0; vtx < msvVertices.size(); vtx++) {
-            if (msvVertices.size() >= 10) continue;
-
-            // loop over tracks
-            int trk_num = (*msvVertices.at(vtx))->nTrackParticles();
-            for (int t = 0; t < trk_num; t++) {
-              const xAOD::TrackParticle *tmpMSVTrk = (*msvVertices.at(vtx))->trackParticle(t);
-              if (tmpMSVTrk == tmpTrk) {
-                trk_assoc_msv = vtx;
-              }
-            }
-          }
-        }
+        int trk_assoc_msv = msv_vtx_map.count(tmpTrk) ?
+          msv_vtx_map.at(tmpTrk) : -1;
         j_trk_assoc_msv.push_back(trk_assoc_msv);
       }
 
@@ -2734,7 +2677,7 @@ StatusCode btagIBLAnalysisAlg::execute() {
   m_cluster_branches.clear();
   m_substructure_moment_branches.clear();
   m_exkt_branches.clear();
-  m_trkjet_branches.clear();
+  m_vrtrkjet_branches.clear();
   m_track_branches.clear();
   m_unclustered_vertices.clear();
 
@@ -3080,13 +3023,6 @@ void btagIBLAnalysisAlg :: clearvectors() {
   v_jet_trk3_z0sig->clear();
   v_jet_sv_scaled_efc->clear();
   v_jet_jf_scaled_efc->clear();
-
-  v_jet_vrtrkjet_pt->clear();
-  v_jet_vrtrkjet_eta->clear();
-  v_jet_vrtrkjet_phi->clear();
-  v_jet_vrtrkjet_m->clear();
-  v_jet_vrtrkjet_ntrk->clear();
-  v_jet_vrtrkjet_mv2c20->clear();
 
   // additions by andrea
   v_jet_mu_pt->clear();

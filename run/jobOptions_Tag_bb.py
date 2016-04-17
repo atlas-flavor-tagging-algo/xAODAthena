@@ -288,7 +288,7 @@ ToolSvc += CfgMgr.CP__PileupReweightingTool("prw",
 for JetCollection in JetCollections:
   shortJetName=JetCollection.replace("AntiKt","Akt").replace("TopoJets","To").replace("TrackJets","Tr").replace("TrimmedPtFrac5SmallR20", "Trm")
   alg = CfgMgr.btagIBLAnalysisAlg("BTagDumpAlg_"+JetCollection, 
-                                  OutputLevel=INFO,
+                                  OutputLevel=DEBUG,
                                   Stream=shortJetName,
                                   InDetTrackSelectionTool   =ToolSvc.InDetTrackSelTool,
                                   TrackVertexAssociationTool=ToolSvc.TightVertexAssocTool,
